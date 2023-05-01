@@ -1,0 +1,234 @@
+// WARNING: This is not the real settings.json that you could copy and paste.
+// Please make sure that you merge the settings in this file into your current
+// Windows Terminal settings file.
+{
+    "actions": [
+        //
+        // UNBIND EVERYTHING FROM THE WINDOWS TERMINAL!!!!
+        //
+
+        // Application-level Keys
+        { "command": "unbound", "keys": "alt+f4" },
+        { "command": "unbound", "keys": "alt+enter" },
+        { "command": "unbound", "keys": "f11" },
+        { "command": "unbound", "keys": "ctrl+shift+space" },
+        { "command": "unbound", "keys": "ctrl+," },
+        { "command": "unbound", "keys": "ctrl+shift+," },
+        { "command": "unbound", "keys": "ctrl+alt+," },
+        { "command": "unbound", "keys": "ctrl+shift+f" },
+        { "command": "unbound", "keys":"ctrl+shift+p" },
+        { "command": "unbound", "keys":"win+sc(41)" },
+        { "command": "unbound", "keys": "alt+space" },
+
+        // Tab Management
+        { "command": "unbound", "keys": "ctrl+shift+t" },
+        { "command": "unbound", "keys": "ctrl+shift+n" },
+        { "command": "unbound", "keys": "ctrl+shift+1" },
+        { "command": "unbound", "keys": "ctrl+shift+2" },
+        { "command": "unbound", "keys": "ctrl+shift+3" },
+        { "command": "unbound", "keys": "ctrl+shift+4" },
+        { "command": "unbound", "keys": "ctrl+shift+5" },
+        { "command": "unbound", "keys": "ctrl+shift+6" },
+        { "command": "unbound", "keys": "ctrl+shift+7" },
+        { "command": "unbound", "keys": "ctrl+shift+8" },
+        { "command": "unbound", "keys": "ctrl+shift+9" },
+        { "command": "unbound", "keys": "ctrl+shift+d" },
+        { "command": "unbound", "keys": "ctrl+tab" },
+        { "command": "unbound", "keys": "ctrl+shift+tab" },
+        { "command": "unbound", "keys": "ctrl+alt+1" },
+        { "command": "unbound", "keys": "ctrl+alt+2" },
+        { "command": "unbound", "keys": "ctrl+alt+3" },
+        { "command": "unbound", "keys": "ctrl+alt+4" },
+        { "command": "unbound", "keys": "ctrl+alt+5" },
+        { "command": "unbound", "keys": "ctrl+alt+6" },
+        { "command": "unbound", "keys": "ctrl+alt+7" },
+        { "command": "unbound", "keys": "ctrl+alt+8" },
+        { "command": "unbound", "keys": "ctrl+alt+9" },
+
+        // Pane Management
+        { "command": "closeOtherPanes" },
+        { "command": "unbound", "keys": "ctrl+shift+w" },
+        { "command": "unbound", "keys": "alt+shift+-" },
+        { "command": "unbound", "keys": "alt+shift+plus" },
+        { "command": "unbound", "keys": "alt+shift+down" },
+        { "command": "unbound", "keys": "alt+shift+left" },
+        { "command": "unbound", "keys": "alt+shift+right" },
+        { "command": "unbound", "keys": "alt+shift+up" },
+        { "command": "unbound", "keys": "alt+down" },
+        { "command": "unbound", "keys": "alt+left" },
+        { "command": "unbound", "keys": "alt+right" },
+        { "command": "unbound", "keys": "alt+up" },
+        { "command": "unbound", "keys": "ctrl+alt+left"},
+
+        // Clipboard Integration
+        { "command": "unbound", "keys": "ctrl+shift+c" },
+        { "command": "unbound", "keys": "ctrl+insert" },
+        { "command": "unbound", "keys": "enter" },
+        { "command": "unbound", "keys": "ctrl+shift+v" },
+        { "command": "unbound", "keys": "shift+insert" },
+        { "command": "unbound", "keys": "ctrl+shift+a" },
+        { "command": "unbound", "keys": "ctrl+shift+m" },
+
+        // Scrollback
+        { "command": "unbound", "keys": "ctrl+shift+down" },
+        { "command": "unbound", "keys": "ctrl+shift+pgdn" },
+        { "command": "unbound", "keys": "ctrl+shift+up" },
+        { "command": "unbound", "keys": "ctrl+shift+pgup" },
+        { "command": "unbound", "keys": "ctrl+shift+home" },
+        { "command": "unbound", "keys": "ctrl+shift+end" },
+
+        // Visual Adjustments
+        { "command": "unbound", "keys": "ctrl+plus" },
+        { "command": "unbound", "keys": "ctrl+minus" },
+        { "command": "unbound", "keys": "ctrl+numpad_plus" },
+        { "command": "unbound", "keys": "ctrl+numpad_minus" },
+        { "command": "unbound", "keys": "ctrl+0" },
+        { "command": "unbound", "keys": "ctrl+numpad_0" },
+
+        //
+        // THEN WE REBIND EVERYTHING AGAIN LMAO
+        // Probably better if we're using the ALT modifier
+        // I think it's less used in apps inside shells
+        //
+
+        // Application-level Keys
+        { "command": "closeWindow", "keys": "alt+f4" },
+        { "command": "toggleFullscreen", "keys": "alt+f11" },
+        { "command": "toggleFocusMode" },
+        { "command": "toggleAlwaysOnTop" },
+        { "command": { "action": "openSettings", "target": "settingsFile" }, "keys": "alt+," },
+        { "command": "find", "keys": "alt+f" },
+        { "command": { "action": "findMatch", "direction": "next" } },
+        { "command": { "action": "findMatch", "direction": "prev" } },
+        { "command": "toggleShaderEffects" },
+        { "command": "openTabColorPicker" },
+        { "command": "renameTab" },
+        { "command": "openTabRenamer" },
+        { "command": "commandPalette", "keys":"alt+p" },
+        { "command": "identifyWindow" },
+        { "command": "openWindowRenamer" },
+        { "command": "quakeMode" },
+        { "command": "openSystemMenu" },
+        { "command": "quit" },
+        { "command": "restoreLastClosed"},
+
+        // Tab Management
+        // "command": "closeTab" is unbound by default.
+        //   The closeTab command closes a tab without confirmation, even if it has multiple panes.
+        { "command": "closeOtherTabs" },
+        { "command": "closeTabsAfter" },
+        { "command": { "action" : "moveTab", "direction": "forward" }},
+        { "command": { "action" : "moveTab", "direction": "backward" }},
+        { "command": "newTab", "keys": "alt+shift+t" },
+        { "command": "newWindow" },
+        { "command": { "action": "newTab", "index": 0 }, "keys": "alt+shift+1" },
+        { "command": { "action": "newTab", "index": 1 }, "keys": "alt+shift+2" },
+        { "command": { "action": "newTab", "index": 2 }, "keys": "alt+shift+3" },
+        { "command": { "action": "newTab", "index": 3 }, "keys": "alt+shift+4" },
+        { "command": { "action": "newTab", "index": 4 }, "keys": "alt+shift+5" },
+        { "command": { "action": "newTab", "index": 5 }, "keys": "alt+shift+6" },
+        { "command": { "action": "newTab", "index": 6 }, "keys": "alt+shift+7" },
+        { "command": { "action": "newTab", "index": 7 }, "keys": "alt+shift+8" },
+        { "command": { "action": "newTab", "index": 8 }, "keys": "alt+shift+9" },
+        { "command": "duplicateTab", "keys": "alt+shift+d" },
+        { "command": "nextTab", "keys": "alt+tab" },
+        { "command": "prevTab", "keys": "alt+shift+tab" },
+        { "command": { "action": "switchToTab", "index": 0 }, "keys": "alt+1" },
+        { "command": { "action": "switchToTab", "index": 1 }, "keys": "alt+2" },
+        { "command": { "action": "switchToTab", "index": 2 }, "keys": "alt+3" },
+        { "command": { "action": "switchToTab", "index": 3 }, "keys": "alt+4" },
+        { "command": { "action": "switchToTab", "index": 4 }, "keys": "alt+5" },
+        { "command": { "action": "switchToTab", "index": 5 }, "keys": "alt+6" },
+        { "command": { "action": "switchToTab", "index": 6 }, "keys": "alt+7" },
+        { "command": { "action": "switchToTab", "index": 7 }, "keys": "alt+8" },
+        { "command": { "action": "switchToTab", "index": 8 }, "keys": "alt+9" },
+
+        // Pane Management
+        { "command": "closeOtherPanes" },
+        { "command": "closePane", "keys": "alt+x" },
+        { "command": { "action": "splitPane", "split": "up" }, "keys": "alt+shift+x" },
+        { "command": { "action": "splitPane", "split": "down" } },
+        { "command": { "action": "splitPane", "split": "left" }, "keys": "alt+shift+v" },
+        { "command": { "action": "splitPane", "split": "right" }  },
+        { "command": { "action": "resizePane", "direction": "down" }, "keys": "alt+shift+down" },
+        { "command": { "action": "resizePane", "direction": "left" }, "keys": "alt+shift+left" },
+        { "command": { "action": "resizePane", "direction": "right" }, "keys": "alt+shift+right" },
+        { "command": { "action": "resizePane", "direction": "up" }, "keys": "alt+shift+up" },
+        { "command": { "action": "moveFocus", "direction": "down" }, "keys": "alt+down" },
+        { "command": { "action": "moveFocus", "direction": "left" }, "keys": "alt+left" },
+        { "command": { "action": "moveFocus", "direction": "right" }, "keys": "alt+right" },
+        { "command": { "action": "moveFocus", "direction": "up" }, "keys": "alt+up" },
+        { "command": { "action": "moveFocus", "direction": "previous" } },
+        { "command": { "action": "moveFocus", "direction": "previousInOrder" } },
+        { "command": { "action": "moveFocus", "direction": "nextInOrder" } },
+        { "command": { "action": "moveFocus", "direction": "first" } },
+        { "command": { "action": "moveFocus", "direction": "parent" } },
+        { "command": { "action": "moveFocus", "direction": "child" } },
+        { "command": { "action": "swapPane", "direction": "down" } },
+        { "command": { "action": "swapPane", "direction": "left" } },
+        { "command": { "action": "swapPane", "direction": "right" } },
+        { "command": { "action": "swapPane", "direction": "up" } },
+        { "command": { "action": "swapPane", "direction": "previous"} },
+        { "command": { "action": "swapPane", "direction": "previousInOrder"} },
+        { "command": { "action": "swapPane", "direction": "nextInOrder"} },
+        { "command": { "action": "swapPane", "direction": "first" } },
+        { "command": "togglePaneZoom" },
+        { "command": "toggleSplitOrientation" },
+        { "command": "toggleReadOnlyMode" },
+        { "command": { "action": "movePane", "index": 0 } },
+        { "command": { "action": "movePane", "index": 1 } },
+        { "command": { "action": "movePane", "index": 2 } },
+        { "command": { "action": "movePane", "index": 3 } },
+        { "command": { "action": "movePane", "index": 4 } },
+        { "command": { "action": "movePane", "index": 5 } },
+        { "command": { "action": "movePane", "index": 6 } },
+        { "command": { "action": "movePane", "index": 7 } },
+        { "command": { "action": "movePane", "index": 8 } },
+
+        // Clipboard Integration
+        { "command": { "action": "copy", "singleLine": false }, "keys": "alt+c" },
+        { "command": "paste", "keys": "alt+v" },
+        { "command": "selectAll", "keys": "alt+a" },
+        { "command": "markMode" },
+        { "command": "toggleBlockSelection" },
+        { "command": "switchSelectionEndpoint" },
+        { "command": "expandSelectionToWord" },
+
+        // Scrollback
+        { "command": "scrollDown", "keys": "alt+j" },
+        { "command": "scrollDownPage", "keys": "alt+pgdn" },
+        { "command": "scrollDownPage", "keys": "alt+l" },
+        { "command": "scrollUp", "keys": "alt+k" },
+        { "command": "scrollUpPage", "keys": "alt+pgup" },
+        { "command": "scrollUpPage", "keys": "alt+h" },
+        { "command": "scrollToTop", "keys": "alt+home" },
+        { "command": "scrollToTop", "keys": "alt+g" },
+        { "command": "scrollToBottom", "keys": "alt+end" },
+        { "command": "scrollToBottom", "keys": "alt+shift+g" },
+        { "command": { "action": "clearBuffer", "clear": "all" } },
+        { "command": "exportBuffer" },
+
+        // Visual Adjustments
+        { "command": { "action": "adjustFontSize", "delta": 1 }, "keys": "alt+plus" },
+        { "command": { "action": "adjustFontSize", "delta": -1 }, "keys": "alt+minus" },
+        { "command": { "action": "adjustFontSize", "delta": 1 }, "keys": "alt+numpad_plus" },
+        { "command": { "action": "adjustFontSize", "delta": -1 }, "keys": "alt+numpad_minus" },
+        { "command": "resetFontSize", "keys": "alt+0" },
+        { "command": "resetFontSize", "keys": "alt+numpad_0" }
+    ],
+    "profiles": {
+        "defaults": {
+            "useAtlasEngine": true,
+            "colorScheme": "One Half Dark",
+            "font": {
+                "face": "CaskaydiaCove NF"
+            },
+            "opacity": 80,
+            "useAcrylic": true
+        },
+    },
+    "startOnUserLogin": true,
+    "newTabPosition": "afterCurrentTab",
+    "copyFormatting": "none",
+    "copyOnSelect": false
+}

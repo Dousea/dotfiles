@@ -1,0 +1,99 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "version": 2,
+  "blocks": [
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "type": "path",
+          "style": "plain",
+          "foreground": "cyan",
+          "template": "\uf07b {{ .Path }} ",
+          "properties": {
+            "style": "agnoster"
+          }
+        },
+        {
+          "type": "project",
+          "style": "powerline",
+          "foreground": "#ffeb3b",
+          "template": ":: {{ if .Error }}{{ .Error }}{{ else }}{{ if .Version }}\uf487 {{.Version}}{{ end }} {{ if .Name }}{{ .Name }}{{ end }}{{ end }} "
+        },
+        {
+          "type": "git",
+          "style": "plain",
+          "foreground": "#F1502F",
+          "template": ":: {{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Staging.Changed }} \uf046 {{ .Staging.String }}{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Working.Changed }} \uf044 {{ .Working.String }}{{ end }} ",
+          "properties": {
+            "fetch_status": true
+          }
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "right",
+      "segments": [
+        {
+          "type": "root",
+          "style": "plain",
+          "foreground": "red",
+          "template": "| root "
+        },
+        {
+          "type": "ruby",
+          "style": "powerline",
+          "foreground": "#d84040",
+          "template": "| \ue791 {{ .Full }}"
+        },
+        {
+          "type": "node",
+          "style": "powerline",
+          "foreground": "#6CA35E",
+          "template": "| \ue718 {{ if .PackageManagerIcon }}{{ .PackageManagerIcon }} {{ end }}{{ .Full }} "
+        },
+        {
+          "type": "npm",
+          "style": "powerline",
+          "foreground": "#ffeb3b",
+          "template": "| \ue71e {{ .Full }} "
+        },
+        {
+          "type": "docker",
+          "style": "powerline",
+          "foreground": "#0B59E7",
+          "template": "| \uf308 {{ .Context }} "
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "type": "exit",
+          "style": "powerline",
+          "foreground": "lightGreen",
+          "foreground_templates": [
+            "{{ if gt .Code 0 }}red{{ end }}"
+          ],
+          "template": "\u279c ",
+          "properties": {
+            "always_enabled": true
+          }
+        }
+      ],
+      "newline": true
+    }
+  ],
+  "transient_prompt": {
+    "foreground": "lightGreen",
+    "foreground_templates": [
+      "{{ if gt .Code 0 }}red{{ end }}"
+    ],
+    "background": "transparent",
+    "template": "\u279c "
+  }
+}

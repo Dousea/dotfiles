@@ -1,0 +1,155 @@
+#!/bin/bash
+
+set -e
+
+if [ ! -f "$(pwd)/install" ]; then
+  echo "Please run from $(dirname "$0") directory."
+  exit 1
+fi
+
+ZDOTDIR="${ZDOTDIR:-$HOME}"
+ANTIGEN_PATH="$HOME/.local/share/antigen"
+OH_MY_POSH_PATH="$HOME/.local/share/oh-my-posh"
+
+mkdir -p $ANTIGEN_PATH
+mkdir -p $OH_MY_POSH_PATH
+
+zsh_shell_check() {
+  echo "Checking for shell..."
+
+  if ! command -v zsh >/dev/null 2>&1; then
+    echo "Zsh is not installed."
+    echo
+    return
+  fi
+
+  if [ ! "$(basename "$SHELL")" = "zsh" ]; then
+    echo "Zsh is not the default shell."
+    echo "You can set it to default with:"
+    echo
+    echo "chsh -s \$(which zsh)"
+    echo
+    return
+  fi
+
+  echo "OK: zsh is configured correctly."
+  echo
+}
+
+zsh_antigen_check() {
+  echo "Checking for antigen.zsh..."
+
+  if [ ! -f "$ANTIGEN_PATH/antigen.zsh" ]; then
+    echo "Antigen.zsh is not found in $ANTIGEN_PATH."
+    echo "Downloading antigen.zsh..."
+    curl -L git.io/antigen > "$ANTIGEN_PATH/antigen.zsh" &&
+      echo "Antigen.zsh is downloaded in $ANTIGEN_PATH."
+    echo
+    return
+  fi
+
+  echo "OK: antigen.zsh is found in $ANTIGEN_PATH."
+  echo
+}
+
+create_file_symlink() {
+  if [ -L "$2" ] && [ "$(realpath "$2")" = "$1" ]
+  then
+    echo "OK: symbolic link $2 is already exist and correct."
+    return
+  fi
+
+  if [ -f "$2" ] && [ ! -L "$2" ]; then
+    echo "Target $2 is not a symbolic link."
+    echo "Renaming the target..."
+    mv "$2" "$2_before"
+  fi
+
+  if [ -L "$2" ] && [ ! "$(realpath "$2")" = "$1" ]; then
+    echo "Symbolic link $2 is incorrect: $(realpath "$2")"
+  fi
+
+  echo "Forcibly creating the symbolic link..."
+  ln -sfr "$1" "$2" && echo "Symbolic link $2 is created."
+}
+
+oh_my_posh_check() {
+  echo "Checking for oh-my-posh..."
+
+  if ! command -v oh-my-posh >/dev/null 2>&1; then
+    echo "Oh-my-posh is not installed."
+    echo "Downloading oh-my-posh..."
+    sudo wget -q --show-progress https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/posh-linux-amd64 -O /usr/local/bin/oh-my-posh &&
+      sudo chmod +x /usr/local/bin/oh-my-posh &&
+      echo "Oh-my-posh is installed in /usr/local/bin." ||
+      return
+  else
+    echo "OK: oh-my-posh is already installed."
+  fi
+
+  echo
+  echo "Checking for oh-my-posh theme file..."
+  create_file_symlink "$(pwd)/oh-my-posh/theme.omp.json" "$OH_MY_POSH_PATH/theme.omp.json"
+  echo
+}
+
+zsh_startup_check() {
+  echo "Checking for startup files..."
+  create_file_symlink "$(pwd)/zsh/.zshenv" "$ZDOTDIR/.zshenv"
+  create_file_symlink "$(pwd)/zsh/.zshrc" "$ZDOTDIR/.zshrc"
+  echo
+}
+
+zsh_check() {
+  zsh_shell_check
+  zsh_antigen_check
+  zsh_startup_check
+}
+
+nvim_check() {
+  echo "Checking for neovim..."
+
+  if ! command -v nvim >/dev/null 2>&1; then
+    echo "Neovim is not installed."
+    echo "Downloading neovim..."
+    sudo wget -q --show-progress https://github.com/neovim/neovim/releases/latest/download/nvim.appimage -O /usr/local/bin/nvim &&
+      sudo chmod +x /usr/local/bin/nvim &&
+      echo "Neovim is installed in /usr/local/bin" ||
+      return
+  else
+    echo "OK: neovim is already installed."
+  fi
+
+  echo
+  echo "Checking for neovim config..."
+  create_file_symlink "$(pwd)/nvim" "$HOME/.config/nvim"
+
+  echo
+  echo "Syncing the plugins for neovim..."
+  nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync" &&
+    echo "OK: plugins for neovim are synced."
+  echo
+}
+
+tmux_check() {
+  echo "Checking for tmux..."
+
+  if ! command -v tmux >/dev/null 2>&1; then
+    echo "Tmux is not installed."
+    echo "Please install tmux first."
+    return
+  fi
+
+  echo "OK: tmux is already installed."
+  echo
+
+  echo "Checking for .tmux.conf..."
+  create_file_symlink "$(pwd)/tmux/.tmux.conf" "$HOME/.tmux.conf"
+  echo
+}
+
+zsh_check
+oh_my_posh_check
+nvim_check
+tmux_check
+
