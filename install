@@ -15,89 +15,60 @@ mkdir -p $ANTIGEN_PATH
 mkdir -p $OH_MY_POSH_PATH
 
 zsh_shell_check() {
-  echo "Checking for shell..."
-
   if ! command -v zsh >/dev/null 2>&1; then
-    echo "Zsh is not installed."
-    echo
+    echo "Error: zsh is not installed."
     return
   fi
 
   if [ ! "$(basename "$SHELL")" = "zsh" ]; then
-    echo "Zsh is not the default shell."
-    echo "You can set it to default with:"
-    echo
-    echo "chsh -s \$(which zsh)"
-    echo
+    echo "Error: zsh is not the default shell."
     return
   fi
 
-  echo "OK: zsh is configured correctly."
-  echo
+  echo "Ok: zsh is configured correctly."
 }
 
 zsh_antigen_check() {
-  echo "Checking for antigen.zsh..."
-
   if [ ! -f "$ANTIGEN_PATH/antigen.zsh" ]; then
-    echo "Antigen.zsh is not found in $ANTIGEN_PATH."
-    echo "Downloading antigen.zsh..."
-    curl -L git.io/antigen > "$ANTIGEN_PATH/antigen.zsh" &&
-      echo "Antigen.zsh is downloaded in $ANTIGEN_PATH."
-    echo
+    echo "Error: antigen.zsh is not found in $$ANTIGEN_PATH: $ANTIGEN_PATH"
     return
   fi
 
-  echo "OK: antigen.zsh is found in $ANTIGEN_PATH."
-  echo
+  echo "Ok: antigen.zsh is found in $ANTIGEN_PATH."
 }
 
 create_file_symlink() {
-  if [ -L "$2" ] && [ "$(realpath "$2")" = "$1" ]
+  if [ -e "$2" ] && [ -L "$2" ] && [ "$(realpath "$2")" = "$1" ]
   then
-    echo "OK: symbolic link $2 is already exist and correct."
+    echo "Ok: symbolic link $2 is already exist and correct."
     return
   fi
 
-  if [ -f "$2" ] && [ ! -L "$2" ]; then
-    echo "Target $2 is not a symbolic link."
-    echo "Renaming the target..."
+  if [ -e "$2" ] && [ ! -L "$2" ]; then
+    echo "Warning: target $2 is not a symbolic link, renaming the target..."
     mv "$2" "$2_before"
   fi
 
   if [ -L "$2" ] && [ ! "$(realpath "$2")" = "$1" ]; then
-    echo "Symbolic link $2 is incorrect: $(realpath "$2")"
+    echo "Warning: symbolic link $2 is incorrect: $(realpath "$2")"
   fi
 
-  echo "Forcibly creating the symbolic link..."
-  ln -sfr "$1" "$2" && echo "Symbolic link $2 is created."
+  ln -sfr "$1" "$2" && echo "Ok: symbolic link $2 is created."
 }
 
 oh_my_posh_check() {
-  echo "Checking for oh-my-posh..."
-
   if ! command -v oh-my-posh >/dev/null 2>&1; then
-    echo "Oh-my-posh is not installed."
-    echo "Downloading oh-my-posh..."
-    sudo wget -q --show-progress https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/posh-linux-amd64 -O /usr/local/bin/oh-my-posh &&
-      sudo chmod +x /usr/local/bin/oh-my-posh &&
-      echo "Oh-my-posh is installed in /usr/local/bin." ||
-      return
+    echo "Error: oh-my-posh is not installed."
   else
-    echo "OK: oh-my-posh is already installed."
+    echo "Ok: oh-my-posh is already installed."
   fi
 
-  echo
-  echo "Checking for oh-my-posh theme file..."
   create_file_symlink "$(pwd)/oh-my-posh/theme.omp.json" "$OH_MY_POSH_PATH/theme.omp.json"
-  echo
 }
 
 zsh_startup_check() {
-  echo "Checking for startup files..."
   create_file_symlink "$(pwd)/zsh/.zshenv" "$ZDOTDIR/.zshenv"
   create_file_symlink "$(pwd)/zsh/.zshrc" "$ZDOTDIR/.zshrc"
-  echo
 }
 
 zsh_check() {
@@ -107,45 +78,33 @@ zsh_check() {
 }
 
 nvim_check() {
-  echo "Checking for neovim..."
-
   if ! command -v nvim >/dev/null 2>&1; then
-    echo "Neovim is not installed."
-    echo "Downloading neovim..."
-    sudo wget -q --show-progress https://github.com/neovim/neovim/releases/latest/download/nvim.appimage -O /usr/local/bin/nvim &&
-      sudo chmod +x /usr/local/bin/nvim &&
-      echo "Neovim is installed in /usr/local/bin" ||
-      return
+    echo "Error: neovim is not installed."
   else
-    echo "OK: neovim is already installed."
+    echo "Ok: neovim is already installed."
   fi
 
-  echo
-  echo "Checking for neovim config..."
   create_file_symlink "$(pwd)/nvim" "$HOME/.config/nvim"
 
-  echo
-  echo "Syncing the plugins for neovim..."
-  nvim --headless -c "autocmd User PackerComplete quitall" -c "PackerSync" &&
-    echo "OK: plugins for neovim are synced."
-  echo
+  echo "Note: remember to sync the plugins for neovim."
 }
 
 tmux_check() {
-  echo "Checking for tmux..."
-
   if ! command -v tmux >/dev/null 2>&1; then
-    echo "Tmux is not installed."
-    echo "Please install tmux first."
-    return
+    echo "Error: tmux is not installed."
+  else
+    echo "Ok: tmux is already installed."
   fi
 
-  echo "OK: tmux is already installed."
-  echo
+  if [ ! -e "$HOME/.tmux/plugins/tpm" ]; then
+    echo "Error: tmux plugin manager is not installed."
+  else
+    echo "OK: tmux plugin manager is already installed."
+  fi
 
-  echo "Checking for .tmux.conf..."
   create_file_symlink "$(pwd)/tmux/.tmux.conf" "$HOME/.tmux.conf"
-  echo
+
+  echo "Note: remember to source $HOME/.tmux.conf and install the plugins through TPM."
 }
 
 zsh_check
