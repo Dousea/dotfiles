@@ -107,8 +107,18 @@ tmux_check() {
   echo "Note: remember to source $HOME/.tmux.conf and install the plugins through TPM."
 }
 
+lazygit_check() {
+  if ! command -v lazygit >/dev/null 2>&1; then
+    echo "Error: lazygit is not installed."
+    return
+  fi
+
+  echo "Ok: lazygit is already installed."
+}
+
 zsh_check
 oh_my_posh_check
 nvim_check
 tmux_check
+lazygit_check
 
