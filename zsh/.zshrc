@@ -32,10 +32,7 @@ function _wrapped_tmux() {
 
   # If failed, just run tmux.
   if [[ $? -ne 0 ]]; then
-    if [[ -e "$ZSH_TMUX_CONFIG" ]]; then
-      tmux_cmd+=(-f "$HOME/.tmux.conf")
-    fi
-
+    tmux_cmd+=(-f "$HOME/.tmux.conf")
     $tmux_cmd new-session -s my-session
   fi
 
