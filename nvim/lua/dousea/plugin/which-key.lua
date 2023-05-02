@@ -114,5 +114,13 @@ return function()
       b = { telescope_builtin.buffers, "Buffers" },
       h = { telescope_builtin.help_tags, "Help Tags" },
     },
+    x = {
+      name = "Trouble",
+      x = { "<cmd>TroubleToggle<enter>", "Toggle Diagnostics" },
+      w = { "<cmd>TroubleToggle workspace_diagnostics<enter>", "Toggle Workspace Diagnostics" },
+      d = { "<cmd>TroubleToggle document_diagnostics<enter>", "Toggle Document Diagnostics" },
+      f = { "<cmd>TroubleToggle quickfix<enter>", "Toggle Quickfix List" },
+      l = { "<cmd>TroubleToggle loclist<enter>", "Toggle Window Location List" },
+    },
   }, { prefix = "<leader>" })
 end
