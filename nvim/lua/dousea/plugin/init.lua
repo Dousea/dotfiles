@@ -31,6 +31,13 @@ return require("packer").startup(function(use)
   }
 
   use {
+    "rmagatti/session-lens",
+    requires = { "rmagatti/auto-session", "nvim-telescope/telescope.nvim" },
+    after = { "telescope.nvim", "auto-session" },
+    config = require("dousea.plugin.session-lens"),
+  }
+
+  use {
     "nvim-treesitter/nvim-treesitter",
     run = function()
       local ts_update = require("nvim-treesitter.install").update { with_sync = true }
