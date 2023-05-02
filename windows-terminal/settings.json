@@ -232,5 +232,6 @@
     "startOnUserLogin": true,
     "newTabPosition": "afterCurrentTab",
     "copyFormatting": "none",
-    "copyOnSelect": false
+    "copyOnSelect": false,
+    "launchMode": "maximized"
 }
