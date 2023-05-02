@@ -99,7 +99,7 @@ return function()
     u = { vim.cmd.UndotreeToggle, "Toggle Undo Tree" },
     s = { "<cmd>Telescope session-lens search_session<enter>", "Session List" },
     t = {
-      name = "tab",
+      name = "Tab",
       t = { "<cmd>tabnew<cr>", "New Tab" },
       q = { "<cmd>tabclose<cr>", "Close Current Tab" },
       h = { "<cmd>tabfirst<cr>", "Go To First Tab" },
@@ -108,7 +108,7 @@ return function()
       l = { "<cmd>tablast<cr>", "Go To Last Tab" },
     },
     f = {
-      name = "file",
+      name = "File",
       f = { telescope_builtin.find_files, "Find Files" },
       g = { telescope_builtin.live_grep, "Live Grep" },
       b = { telescope_builtin.buffers, "Buffers" },
