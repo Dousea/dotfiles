@@ -69,6 +69,7 @@ oh_my_posh_check() {
 zsh_startup_check() {
   create_file_symlink "$(pwd)/zsh/.zshenv" "$ZDOTDIR/.zshenv"
   create_file_symlink "$(pwd)/zsh/.zshrc" "$ZDOTDIR/.zshrc"
+  create_file_symlink "$(pwd)/zsh/.aliasrc" "$HOME/.aliasrc"
 }
 
 zsh_check() {

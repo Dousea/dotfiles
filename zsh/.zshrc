@@ -60,3 +60,8 @@ if [[ -z "$TMUX" ]]; then
   fi
 fi
 
+# Add our aliases
+if [[ -f ~/.aliasrc ]]; then
+  source ~/.aliasrc
+fi
+
