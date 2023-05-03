@@ -3,6 +3,13 @@ eval "$(oh-my-posh init zsh --config "$HOME/.local/share/oh-my-posh/theme.omp.js
 bindkey -v
 
 autoload -Uz colors && colors
+alias ls='ls --color=auto'
+alias dir='dir --color=auto'
+alias vdir='vdir --color=auto'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+
 autoload -Uz compinit && compinit
 zstyle ':completion:*' completer _complete
 zstyle ':completion:*' matcher-list '' 'm:{a-z}={A-Z}' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=* l:|=*'
