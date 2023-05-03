@@ -53,12 +53,6 @@ return require("packer").startup(function(use)
   use "mfussenegger/nvim-dap"
 
   use {
-    "jose-elias-alvarez/null-ls.nvim",
-    requires = "nvim-lua/plenary.nvim",
-    config = require("dousea.plugin.null-ls"),
-  }
-
-  use {
     "williamboman/mason.nvim",
     run = ":MasonUpdate",
   }
