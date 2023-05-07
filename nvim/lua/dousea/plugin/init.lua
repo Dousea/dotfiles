@@ -86,6 +86,12 @@ return require("packer").startup(function(use)
   }
 
   use {
+    "kylechui/nvim-surround",
+    tag = "*", -- Use for stability; omit to use `main` branch for the latest features
+    config = require("dousea.plugin.nvim-surround"),
+  }
+
+  use {
     "numToStr/Comment.nvim",
     config = require("dousea.plugin.comment"),
   }
