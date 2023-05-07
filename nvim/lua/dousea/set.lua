@@ -1,6 +1,8 @@
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
+vim.o.showtabline = 2
+
 vim.o.background = "dark"
 
 vim.o.timeout = true
