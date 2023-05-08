@@ -97,7 +97,6 @@ return function()
     r = { '<cmd>!for f in "$HOME/.config/nvim/**/*.*; do source $f; done<enter><cmd>PackerSync<enter>', "Reload Config Files" },
     e = { function() nvim_tree_api.tree.focus() end, "Open/Focus File Tree" },
     u = { vim.cmd.UndotreeToggle, "Toggle Undo Tree" },
-    s = { "<cmd>Telescope session-lens search_session<enter>", "Session List" },
     t = {
       name = "Tab",
       t = { "<cmd>tabnew<cr>", "New Tab" },
