@@ -104,11 +104,6 @@ return require("packer").startup(function(use)
   }
 
   use {
-    "nanozuki/tabby.nvim",
-    config = require("dousea.plugin.tabby")
-  }
-
-  use {
     "lukas-reineke/indent-blankline.nvim",
     config = require("dousea.plugin.indent-blankline"),
   }
