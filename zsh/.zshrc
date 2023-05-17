@@ -90,5 +90,17 @@ if [[ -z "$TMUX" ]]; then
 fi
 
 # Add our aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+if [ -x "$(command -v lazygit)" ]; then
+  alias lzg='lazygit'
+fi
+
+if [ -x "$(command -v lazydocker)" ]; then
+  alias lzd='lazydocker'
+fi
+
 [[ -f ~/.aliasrc ]] && source ~/.aliasrc
 
