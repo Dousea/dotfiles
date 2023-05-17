@@ -92,6 +92,7 @@ return function()
 
   local nvim_tree_api = require("nvim-tree.api")
   local telescope_builtin = require("telescope.builtin")
+  local telescope_live_grep_args = require("telescope").extensions.live_grep_args
 
   wk.register({
     r = { '<cmd>!for f in "$HOME/.config/nvim/**/*.*; do source $f; done<enter><cmd>PackerSync<enter>', "Reload Config Files" },
@@ -109,7 +110,7 @@ return function()
     f = {
       name = "File",
       f = { telescope_builtin.find_files, "Find Files" },
-      g = { telescope_builtin.live_grep, "Live Grep" },
+      g = { telescope_live_grep_args.live_grep_args, "Live Grep (with args)" },
       b = { telescope_builtin.buffers, "Buffers" },
       h = { telescope_builtin.help_tags, "Help Tags" },
     },
