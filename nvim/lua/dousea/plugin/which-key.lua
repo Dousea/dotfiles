@@ -95,7 +95,6 @@ return function()
   local telescope_live_grep_args = require("telescope").extensions.live_grep_args
 
   wk.register({
-    r = { '<cmd>!for f in "$HOME/.config/nvim/**/*.*; do source $f; done<enter><cmd>PackerSync<enter>', "Reload Config Files" },
     e = { function() nvim_tree_api.tree.focus() end, "Open/Focus File Tree" },
     u = { vim.cmd.UndotreeToggle, "Toggle Undo Tree" },
     t = {
