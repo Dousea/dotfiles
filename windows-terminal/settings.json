@@ -216,22 +216,29 @@
         { "command": "resetFontSize", "keys": "alt+0" },
         { "command": "resetFontSize", "keys": "alt+numpad_0" }
     ],
+    // ...
     "profiles": {
         "defaults": {
             "useAtlasEngine": true,
             "colorScheme": "One Half Dark",
             "font": {
-                "face": "CaskaydiaCove NF",
-                "size": 12.0
+                "face": "JetBrainsMono Nerd Font",
+                "size": 13.0,
+                "weight": "normal",
+                "cellHeight": "1.2"
             },
             "opacity": 80,
             "useAcrylic": true,
             "padding": "0"
         },
+        // ...
     },
+    // ...
     "startOnUserLogin": true,
     "newTabPosition": "afterCurrentTab",
     "copyFormatting": "none",
     "copyOnSelect": false,
-    "launchMode": "maximized"
+    "launchMode": "maximized",
+    "useAcrylicInTabRow": true
+    // ...
 }
