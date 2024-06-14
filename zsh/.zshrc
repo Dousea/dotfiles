@@ -1,4 +1,11 @@
-eval "$(oh-my-posh init zsh --config "$HOME/.local/share/oh-my-posh/theme.omp.json")"
+source "$HOME/.local/share/antigen/antigen.zsh"
+antigen bundle zsh-users/zsh-completions
+ZSH_AUTOSUGGEST_STRATEGY=completion
+antigen bundle zsh-users/zsh-autosuggestions
+antigen bundle jeffreytse/zsh-vi-mode
+antigen bundle akash329d/zsh-alias-finder
+antigen bundle zsh-users/zsh-syntax-highlighting
+antigen apply
 
 bindkey -v
 
@@ -15,23 +22,7 @@ zstyle ':completion:*' completer _complete
 zstyle ':completion:*' matcher-list '' 'm:{a-z}={A-Z}' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=* l:|=*'
 _comp_options+=(globdots) # Include hidden files
 
-source "$HOME/.local/share/antigen/antigen.zsh"
-antigen bundle zsh-users/zsh-completions
-ZSH_AUTOSUGGEST_STRATEGY=completion
-antigen bundle zsh-users/zsh-autosuggestions
-antigen bundle jeffreytse/zsh-vi-mode
-antigen bundle akash329d/zsh-alias-finder
-antigen bundle zsh-users/zsh-syntax-highlighting
-antigen apply
-
 autoload -U add-zsh-hook
-
-# Loads RVM
-[[ -f ~/.rvm/scripts/rvm ]] && source ~/.rvm/scripts/rvm
-
-# Loads NVM
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 function _lazyload_nvm_node() {
   if ! [ -x "$(command -v nvm)" ]; then
@@ -57,14 +48,14 @@ add-zsh-hook chpwd _lazyload_nvm_node
 _lazyload_nvm_node
 
 function _wrapped_tmux() {
-  if [[ -n "$@" ]]; then
-    command tmux "$@"
-    return $?
-  fi
-
   local -a tmux_cmd
   tmux_cmd=(command tmux)
   tmux_cmd+=(-u)
+
+  if [[ -n "$@" ]]; then
+    $tmux_cmd "$@"
+    return $?
+  fi
 
   # Try to connect to an existing session.
   $tmux_cmd attach -t my-session
@@ -83,15 +74,6 @@ compdef _tmux _wrapped_tmux
 # Alias tmux to our wrapper function.
 alias tmux=_wrapped_tmux
 
-# Autostart if not already in tmux and enabled.
-if [[ -z "$TMUX" ]]; then
-  # Actually don't autostart if we already did and multiple autostarts are disabled.
-  if [[ "$ZSH_TMUX_AUTOSTARTED" != "true" ]]; then
-    export ZSH_TMUX_AUTOSTARTED=true
-    _wrapped_tmux
-  fi
-fi
-
 # Add our aliases
 alias ll='ls -alF'
 alias la='ls -A'
@@ -107,3 +89,24 @@ fi
 
 [[ -f ~/.aliasrc ]] && source ~/.aliasrc
 
+# Rust?
+. "$HOME/.cargo/env"
+
+# Loads NVM
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# Loads RVM
+[[ -f ~/.rvm/scripts/rvm ]] && source ~/.rvm/scripts/rvm
+source $(rvm env --path)
+
+# Autostart if not already in tmux and enabled.
+if [[ -z "$TMUX" ]]; then
+  # Actually don't autostart if we already did and multiple autostarts are disabled.
+  if [[ "$ZSH_TMUX_AUTOSTARTED" != "true" ]]; then
+    export ZSH_TMUX_AUTOSTARTED=true
+    _wrapped_tmux
+  fi
+fi
+
+eval "$(oh-my-posh init zsh --config "$HOME/.local/share/oh-my-posh/theme.omp.json")"
