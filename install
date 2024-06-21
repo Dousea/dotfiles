@@ -2,124 +2,253 @@
 
 set -e
 
+DEFAULT="$(tput sgr0)"
+BG_BLACK="$(tput setab 0)"
+BG_RED="$(tput setab 1)"
+BG_GREEN="$(tput setab 2)"
+BG_ORANGE="$(tput setab 3)"
+BG_BLUE="$(tput setab 4)"
+HIGHLIGHT="$(tput setaf 3)"
+
+print_log() {
+	printf "${BG_BLUE}  LOG   ${DEFAULT} "
+	printf "$1\n"
+}
+
+print_error() {
+	printf "${BG_RED} ERROR  ${DEFAULT} "
+	printf "$1\n"
+}
+
+print_warn() {
+	printf "${BG_ORANGE}  WARN  ${DEFAULT} "
+	printf "$1\n"
+}
+
+print_ok() {
+	printf "${BG_GREEN}   OK   ${DEFAULT} "
+	printf "$1\n"
+}
+
+print_note() {
+	printf "${BG_BLACK}  NOTE  ${DEFAULT} "
+	printf "$1\n"
+}
+
+print_line() {
+	local columns="$(stty size | awk '{print $2}')"
+	printf "$BG_BLACK"
+	printf "%${columns}s"
+	printf "$DEFAULT\n"
+}
+
 if [ ! -f "$(pwd)/install" ]; then
-  echo "Please run from $(dirname "$0") directory."
-  exit 1
+	print_error "Please run from $HIGHLIGHT$(dirname "$0")$DEFAULT directory."
+	exit 1
 fi
 
 ZDOTDIR="${ZDOTDIR:-$HOME}"
-ANTIGEN_PATH="$HOME/.local/share/antigen"
+ZINIT_PATH="$HOME/.local/share/zinit"
 OH_MY_POSH_PATH="$HOME/.local/share/oh-my-posh"
 
-mkdir -p $ANTIGEN_PATH
-mkdir -p $OH_MY_POSH_PATH
+[ ! -d "$ZINIT_PATH" ] && mkdir -p $ZINIT_PATH
+[ ! -d "$OH_MY_POSH_PATH" ] && mkdir -p $OH_MY_POSH_PATH
 
 zsh_shell_check() {
-  if ! command -v zsh >/dev/null 2>&1; then
-    echo "Error: zsh is not installed."
-    return
-  fi
+	if ! command -v zsh >/dev/null 2>&1; then
+		print_error "Zsh is not installed."
+		return
+	fi
 
-  if [ ! "$(basename "$SHELL")" = "zsh" ]; then
-    echo "Error: zsh is not the default shell."
-    return
-  fi
+	if [ ! "$(basename "$SHELL")" = "zsh" ]; then
+		print_warn "Zsh is not the default shell."
+		return
+	fi
 
-  echo "Ok: zsh is configured correctly."
+	print_ok "Zsh is configured correctly."
 }
 
-zsh_antigen_check() {
-  if [ ! -f "$ANTIGEN_PATH/antigen.zsh" ]; then
-    echo "Error: antigen.zsh is not found in $$ANTIGEN_PATH: $ANTIGEN_PATH"
-    return
-  fi
+zsh_zinit_check() {
+	if [ ! -f "$ZINIT_PATH/zinit.zsh" ]; then
+		print_error "zinit.zsh is not found in $HIGHLIGHT$ZINIT_PATH$DEFAULT."
+		print_log "Cloning zinit.zsh into $HIGHLIGHT$ZINIT_PATH$DEFAULT ..."
+		print_line
 
-  echo "Ok: antigen.zsh is found in $ANTIGEN_PATH."
+		if ! git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_PATH" 2>&1; then
+			print_line
+			print_error "zinit.zsh installation has failed."
+			return
+		fi
+
+		print_line
+		print_ok "zinit.zsh has successfully cloned in $HIGHLIGHT$ZINIT_PATH$DEFAULT."
+	else
+		print_ok "zinit.zsh is found in $HIGHLIGHT$ZINIT_PATH$DEFAULT."
+
+		if [ -z "$(cd $ZINIT_PATH && git status -s)" ]; then
+			print_ok "zinit.zsh has no updates."
+		else
+			print_note "zinit.zsh has updates."
+		fi
+	fi
+}
+
+brew_check() {
+	if ! command -v brew >/dev/null 2>&1; then
+		print_error "Homebrew is not installed."
+		print_log "Installing Homebrew ..."
+		print_line
+		
+		if ! /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"  2>&1; then
+			print_line
+			print_error "Homebrew installation has failed. Try to install manually."
+			return
+		fi
+
+		eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+		print_line
+		print_ok "Homebrew has been successfully installed."
+	else
+		print_ok "Homebrew is already installed."
+	fi
 }
 
 create_file_symlink() {
-  if [ -e "$2" ] && [ -L "$2" ] && [ "$(realpath "$2")" = "$1" ]
-  then
-    echo "Ok: symbolic link $2 is already exist and correct."
-    return
-  fi
+	if [ -e "$2" ] && [ -L "$2" ] && [ "$(realpath "$2")" = "$1" ]; then
+		print_ok "Symbolic link $HIGHLIGHT$2$DEFAULT is already exist and correct."
+		return
+	fi
 
-  if [ -e "$2" ] && [ ! -L "$2" ]; then
-    echo "Warning: target $2 is not a symbolic link, renaming the target..."
-    mv "$2" "$2_before"
-  fi
+	if [ -e "$2" ] && [ ! -L "$2" ]; then
+		local timestamp="$(date +%s%N)"
+		print_warn "Target $HIGHLIGHT$2$DEFAULT is not a symbolic link."
+		print_log "Renaming the target to $HIGHLIGHT${2}_$timestamp$DEFAULT ..."
+		mv "$2" "${2}_$timestamp" >/dev/null 2>&1 &&
+			print_ok "Target has been successfully renamed." ||
+			print_error "Target renaming has failed."
+	fi
 
-  if [ -L "$2" ] && [ ! "$(realpath "$2")" = "$1" ]; then
-    echo "Warning: symbolic link $2 is incorrect: $(realpath "$2")"
-  fi
+	if [ -L "$2" ] && [ ! "$(realpath "$2")" = "$1" ]; then
+		print_warn "Symbolic link $HIGHLIGHT$2$DEFAULT is incorrect: $HIGHLIGHT$(realpath "$2")$DEFAULT"
+	fi
 
-  ln -sfr "$1" "$2" && echo "Ok: symbolic link $2 is created."
+	ln -sfr "$1" "$2" && print_ok "Symbolic link $HIGHLIGHT$2$DEFAULT is created."
 }
 
 oh_my_posh_check() {
-  if ! command -v oh-my-posh >/dev/null 2>&1; then
-    echo "Error: oh-my-posh is not installed."
-  else
-    echo "Ok: oh-my-posh is already installed."
-  fi
+	if ! command -v oh-my-posh >/dev/null 2>&1; then
+		print_error "Oh My Posh is not installed."
+		print_log "Installing Oh My Posh ..."
+		print_line
+		
+		if ! brew install jandedobbeleer/oh-my-posh/oh-my-posh 2>&1; then
+			print_error "Oh My Posh installation has failed. Try to install manually with Homebrew."
+			return
+		fi
 
-  create_file_symlink "$(pwd)/oh-my-posh/theme.omp.json" "$OH_MY_POSH_PATH/theme.omp.json"
+		print_line
+		print_ok "Oh My Posh has been installed."
+	else
+		print_ok "Oh My Posh is already installed."
+	fi
+
+	create_file_symlink "$(pwd)/oh-my-posh/theme.omp.json" "$OH_MY_POSH_PATH/theme.omp.json"
 }
 
 zsh_startup_check() {
-  create_file_symlink "$(pwd)/zsh/.zshenv" "$ZDOTDIR/.zshenv"
-  create_file_symlink "$(pwd)/zsh/.zshrc" "$ZDOTDIR/.zshrc"
-  create_file_symlink "$(pwd)/zsh/.aliasrc" "$HOME/.aliasrc"
+	create_file_symlink "$(pwd)/zsh/.zshenv" "$ZDOTDIR/.zshenv"
+	create_file_symlink "$(pwd)/zsh/.zshrc" "$ZDOTDIR/.zshrc"
 }
 
 zsh_check() {
-  zsh_shell_check
-  zsh_antigen_check
-  zsh_startup_check
+	zsh_shell_check
+	zsh_zinit_check
+	zsh_startup_check
 }
 
 nvim_check() {
-  if ! command -v nvim >/dev/null 2>&1; then
-    echo "Error: neovim is not installed."
-  else
-    echo "Ok: neovim is already installed."
-  fi
+	if ! command -v nvim >/dev/null 2>&1; then
+		print_error "Neovim is not installed."
+		print_log "Installing Neovim through Homebrew ..."
+		print_line
 
-  create_file_symlink "$(pwd)/nvim" "$HOME/.config/nvim"
+		if ! brew install neovim 2>&1; then
+			print_error "Neovim installation has failed. Try to install manually with Homebrew."
+			return
+		fi
 
-  echo "Note: remember to sync the plugins for neovim."
+		print_line
+		print_ok "Neovim has been installed."
+	else
+		print_ok "Neovim is already installed."
+	fi
+
+	create_file_symlink "$(pwd)/nvim" "$HOME/.config/nvim"
+
+	print_note "Remember to sync the plugins for neovim."
 }
 
 tmux_check() {
-  if ! command -v tmux >/dev/null 2>&1; then
-    echo "Error: tmux is not installed."
-  else
-    echo "Ok: tmux is already installed."
-  fi
+	if ! command -v tmux >/dev/null 2>&1; then
+		print_error "Tmux is not installed."
+		print_log "Installing Tmux through Homebrew ..."
+		print_line
 
-  if [ ! -e "$HOME/.tmux/plugins/tpm" ]; then
-    echo "Error: tmux plugin manager is not installed."
-  else
-    echo "OK: tmux plugin manager is already installed."
-  fi
+		if ! brew install tmux 2>&1; then
+			print_error "Tmux installation has failed. Try to install manually with Homebrew."
+			return
+		fi
 
-  create_file_symlink "$(pwd)/tmux/.tmux.conf" "$HOME/.tmux.conf"
+		print_line
+		print_ok "Tmux has been installed."
+	else
+		print_ok "Tmux is already installed."
+	fi
 
-  echo "Note: remember to source $HOME/.tmux.conf and install the plugins through TPM."
+	if [ ! -e "$HOME/.tmux/plugins/tpm" ]; then
+		local tpm_path="$HOME/.tmux/plugins/tpm"
+		print_error "Tmux Plugin Manager is not installed."
+		print_log "Cloning Tmux Plugin Manager into $HIGHLIGHT$tpm_path$DEFAULT ..."
+		print_line
+
+		if ! git clone https://github.com/tmux-plugins/tpm "$tpm_path" 2>&1; then
+			print_error "Tmux Plugin Manager installation has failed. Try to install manually."
+			return
+		fi
+
+		print_line
+		print_ok "Tmux Plugin Manager has been successfully cloned in $tpm_path."
+	else
+		print_ok "Tmux Plugin Manager is already installed."
+	fi
+
+	create_file_symlink "$(pwd)/tmux/.tmux.conf" "$HOME/.tmux.conf"
+
+	print_note "Remember to source $HIGHLIGHT$HOME/.tmux.conf$DEFAULT and install the plugins through TPM."
 }
 
 lazygit_check() {
-  if ! command -v lazygit >/dev/null 2>&1; then
-    echo "Error: lazygit is not installed."
-    return
-  fi
+	if ! command -v lazygit >/dev/null 2>&1; then
+		print_error "LazyGit is not installed."
+		print_log "Installing LazyGit through Homebrew ..."
+		print_line
 
-  echo "Ok: lazygit is already installed."
+		if ! brew install jesseduffield/lazygit/lazygit 2>&1; then
+			print_error "LazyGit installation has failed. Try to install manually with Homebrew."
+			return
+		fi
+
+		print_line
+		print_ok "LazyGit has been successfully installed."
+	else
+		print_ok "LazyGit is already installed."
+	fi
 }
 
 zsh_check
+brew_check
 oh_my_posh_check
 nvim_check
 tmux_check
 lazygit_check
-
