@@ -88,6 +88,9 @@ fi
 
 [[ -f ~/.aliasrc ]] && source ~/.aliasrc
 
+# Homebrew
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
 # Rust?
 [[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
 
