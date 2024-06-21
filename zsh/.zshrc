@@ -1,11 +1,10 @@
-source "$HOME/.local/share/antigen/antigen.zsh"
-antigen bundle zsh-users/zsh-completions
+source "$HOME/.local/share/zinit/zinit.zsh"
+zinit light zsh-users/zsh-completions
 ZSH_AUTOSUGGEST_STRATEGY=completion
-antigen bundle zsh-users/zsh-autosuggestions
-antigen bundle jeffreytse/zsh-vi-mode
-antigen bundle akash329d/zsh-alias-finder
-antigen bundle zsh-users/zsh-syntax-highlighting
-antigen apply
+zinit light zsh-users/zsh-autosuggestions
+zinit light jeffreytse/zsh-vi-mode
+zinit light akash329d/zsh-alias-finder
+zinit light zsh-users/zsh-syntax-highlighting
 
 bindkey -v
 
