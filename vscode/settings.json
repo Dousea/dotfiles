@@ -1,5 +1,7 @@
 {
-  "editor.fontFamily": "'CaskaydiaCove NF', Consolas, 'Courier New', monospace",
+  "editor.fontFamily": "'JetBrainsMono Nerd Font', Consolas, 'Courier New', monospace",
+  "editor.fontSize": 13,
+  "editor.lineHeight": 1.2,
   "editor.tabSize": 2,
   "editor.renderWhitespace": "all",
   "git.autofetch": true,
