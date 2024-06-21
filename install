@@ -93,12 +93,15 @@ zsh_shell_check() {
 
 	if [ ! "$(basename "$SHELL")" = "zsh" ]; then
 		print_warn "Zsh is not the default shell."
+		print_line
 
-		if ! chsh -s $(which zsh) >/dev/null 2>&1; then
+		if ! chsh -s "$(which zsh)" 2>&1; then
+			print_line
 			print_error "Could not change default shell to Zsh. Try to change it manually."
 			return
 		fi
 
+		print_line
 		print_ok "Zsh is set as the default shell."
 	fi
 
