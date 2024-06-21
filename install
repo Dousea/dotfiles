@@ -84,12 +84,6 @@ zsh_zinit_check() {
 		print_ok "zinit.zsh has successfully cloned in $HIGHLIGHT$ZINIT_PATH$DEFAULT."
 	else
 		print_ok "zinit.zsh is found in $HIGHLIGHT$ZINIT_PATH$DEFAULT."
-
-		if [ -z "$(cd $ZINIT_PATH && git status -s)" ]; then
-			print_ok "zinit.zsh has no updates."
-		else
-			print_note "zinit.zsh has updates."
-		fi
 	fi
 }
 
