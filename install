@@ -205,7 +205,7 @@ tmux_check() {
 
 	create_file_symlink "$(pwd)/tmux/.tmux.conf" "$HOME/.tmux.conf"
 
-	print_note "Remember to source $HIGHLIGHT$HOME/.tmux.conf$DEFAULT and install the plugins through TPM."
+	print_note "Remember to: source $HIGHLIGHT$HOME/.tmux.conf$DEFAULT; and install the plugins through TPM."
 }
 
 nvim_check() {
