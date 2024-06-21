@@ -37,7 +37,7 @@ print_note() {
 
 print_line() {
 	local columns="$(stty size | awk '{print $2}')"
-	printf "$BG_BLACK"
+	printf "$BG_BLUE"
 	printf "%${columns}s"
 	printf "$DEFAULT\n"
 }
@@ -54,15 +54,52 @@ OH_MY_POSH_PATH="$HOME/.local/share/oh-my-posh"
 [ ! -d "$ZINIT_PATH" ] && mkdir -p $ZINIT_PATH
 [ ! -d "$OH_MY_POSH_PATH" ] && mkdir -p $OH_MY_POSH_PATH
 
+brew_check() {
+	if ! command -v brew >/dev/null 2>&1; then
+		print_warn "Homebrew is not installed."
+		print_log "Installing Homebrew ..."
+		print_line
+		
+		if ! /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"  2>&1; then
+			print_line
+			print_error "Homebrew installation has failed. Try to install manually."
+			return
+		fi
+
+		eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+		print_line
+		print_ok "Homebrew has been successfully installed."
+	else
+		print_ok "Homebrew is already installed."
+	fi
+}
+
 zsh_shell_check() {
 	if ! command -v zsh >/dev/null 2>&1; then
-		print_error "Zsh is not installed."
-		return
+		print_warn "Zsh is not installed."
+		print_log "Installing Zsh through Homebrew ..."
+		print_line
+
+		if ! brew install zsh 2>&1; then
+			print_line
+			print_error "Zsh installation has failed. Try to install manually."
+			return
+		fi
+
+		print_line
+		print_ok "Zsh has been successfully installed."
 	fi
 
 	if [ ! "$(basename "$SHELL")" = "zsh" ]; then
 		print_warn "Zsh is not the default shell."
-		return
+
+		if ! chsh -s $(which zsh) >/dev/null 2>&1; then
+			print_error "Could not change default shell to Zsh. Try to change it manually."
+			return
+		fi
+
+		print_ok "Zsh is set as the default shell."
 	fi
 
 	print_ok "Zsh is configured correctly."
@@ -90,27 +127,6 @@ zsh_zinit_check() {
 		else
 			print_note "zinit.zsh has updates."
 		fi
-	fi
-}
-
-brew_check() {
-	if ! command -v brew >/dev/null 2>&1; then
-		print_error "Homebrew is not installed."
-		print_log "Installing Homebrew ..."
-		print_line
-		
-		if ! /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"  2>&1; then
-			print_line
-			print_error "Homebrew installation has failed. Try to install manually."
-			return
-		fi
-
-		eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-
-		print_line
-		print_ok "Homebrew has been successfully installed."
-	else
-		print_ok "Homebrew is already installed."
 	fi
 }
 
@@ -246,8 +262,8 @@ lazygit_check() {
 	fi
 }
 
-zsh_check
 brew_check
+zsh_check
 oh_my_posh_check
 nvim_check
 tmux_check
