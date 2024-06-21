@@ -54,55 +54,15 @@ OH_MY_POSH_PATH="$HOME/.local/share/oh-my-posh"
 [ ! -d "$ZINIT_PATH" ] && mkdir -p $ZINIT_PATH
 [ ! -d "$OH_MY_POSH_PATH" ] && mkdir -p $OH_MY_POSH_PATH
 
-brew_check() {
-	if ! command -v brew >/dev/null 2>&1; then
-		print_warn "Homebrew is not installed."
-		print_log "Installing Homebrew ..."
-		print_line
-		
-		if ! /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"  2>&1; then
-			print_line
-			print_error "Homebrew installation has failed. Try to install manually."
-			return
-		fi
-
-		eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-
-		print_line
-		print_ok "Homebrew has been successfully installed."
-	else
-		print_ok "Homebrew is already installed."
-	fi
-}
-
 zsh_shell_check() {
 	if ! command -v zsh >/dev/null 2>&1; then
-		print_warn "Zsh is not installed."
-		print_log "Installing Zsh through Homebrew ..."
-		print_line
-
-		if ! brew install zsh 2>&1; then
-			print_line
-			print_error "Zsh installation has failed. Try to install manually."
-			return
-		fi
-
-		print_line
-		print_ok "Zsh has been successfully installed."
+		print_error "Zsh is not installed."
+		exit 1
 	fi
 
 	if [ ! "$(basename "$SHELL")" = "zsh" ]; then
-		print_warn "Zsh is not the default shell."
-		print_line
-
-		if ! chsh -s "$(which zsh)" 2>&1; then
-			print_line
-			print_error "Could not change default shell to Zsh. Try to change it manually."
-			return
-		fi
-
-		print_line
-		print_ok "Zsh is set as the default shell."
+		print_error "Zsh is not the default shell."
+		exit 1
 	fi
 
 	print_ok "Zsh is configured correctly."
@@ -110,14 +70,14 @@ zsh_shell_check() {
 
 zsh_zinit_check() {
 	if [ ! -f "$ZINIT_PATH/zinit.zsh" ]; then
-		print_error "zinit.zsh is not found in $HIGHLIGHT$ZINIT_PATH$DEFAULT."
+		print_warn "zinit.zsh is not found in $HIGHLIGHT$ZINIT_PATH$DEFAULT."
 		print_log "Cloning zinit.zsh into $HIGHLIGHT$ZINIT_PATH$DEFAULT ..."
 		print_line
 
 		if ! git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_PATH" 2>&1; then
 			print_line
 			print_error "zinit.zsh installation has failed."
-			return
+			exit 1
 		fi
 
 		print_line
@@ -157,17 +117,17 @@ create_file_symlink() {
 
 oh_my_posh_check() {
 	if ! command -v oh-my-posh >/dev/null 2>&1; then
-		print_error "Oh My Posh is not installed."
+		print_warn "Oh My Posh is not installed."
 		print_log "Installing Oh My Posh ..."
 		print_line
 		
 		if ! brew install jandedobbeleer/oh-my-posh/oh-my-posh 2>&1; then
-			print_error "Oh My Posh installation has failed. Try to install manually with Homebrew."
-			return
+			print_line
+			print_warn "Oh My Posh installation has failed. Try to install manually with Homebrew."
+		else
+			print_line
+			print_ok "Oh My Posh has been installed."
 		fi
-
-		print_line
-		print_ok "Oh My Posh has been installed."
 	else
 		print_ok "Oh My Posh is already installed."
 	fi
@@ -186,36 +146,36 @@ zsh_check() {
 	zsh_startup_check
 }
 
-nvim_check() {
-	if ! command -v nvim >/dev/null 2>&1; then
-		print_error "Neovim is not installed."
-		print_log "Installing Neovim through Homebrew ..."
+brew_check() {
+	if ! command -v brew >/dev/null 2>&1; then
+		print_warn "Homebrew is not installed."
+		print_log "Installing Homebrew ..."
 		print_line
-
-		if ! brew install neovim 2>&1; then
-			print_error "Neovim installation has failed. Try to install manually with Homebrew."
-			return
+		
+		if ! /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"  2>&1; then
+			print_line
+			print_error "Homebrew installation has failed. Try to install manually."
+			exit 1
 		fi
 
+		eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
 		print_line
-		print_ok "Neovim has been installed."
+		print_ok "Homebrew has been successfully installed."
 	else
-		print_ok "Neovim is already installed."
+		print_ok "Homebrew is already installed."
 	fi
-
-	create_file_symlink "$(pwd)/nvim" "$HOME/.config/nvim"
-
-	print_note "Remember to sync the plugins for neovim."
 }
 
 tmux_check() {
 	if ! command -v tmux >/dev/null 2>&1; then
-		print_error "Tmux is not installed."
+		print_warn "Tmux is not installed."
 		print_log "Installing Tmux through Homebrew ..."
 		print_line
 
 		if ! brew install tmux 2>&1; then
-			print_error "Tmux installation has failed. Try to install manually with Homebrew."
+			print_line
+			print_warn "Tmux installation has failed. Try to install manually with Homebrew."
 			return
 		fi
 
@@ -227,12 +187,13 @@ tmux_check() {
 
 	if [ ! -e "$HOME/.tmux/plugins/tpm" ]; then
 		local tpm_path="$HOME/.tmux/plugins/tpm"
-		print_error "Tmux Plugin Manager is not installed."
+		print_warn "Tmux Plugin Manager is not installed."
 		print_log "Cloning Tmux Plugin Manager into $HIGHLIGHT$tpm_path$DEFAULT ..."
 		print_line
 
 		if ! git clone https://github.com/tmux-plugins/tpm "$tpm_path" 2>&1; then
-			print_error "Tmux Plugin Manager installation has failed. Try to install manually."
+			print_line
+			print_warn "Tmux Plugin Manager installation has failed. Try to install manually."
 			return
 		fi
 
@@ -247,27 +208,49 @@ tmux_check() {
 	print_note "Remember to source $HIGHLIGHT$HOME/.tmux.conf$DEFAULT and install the plugins through TPM."
 }
 
+nvim_check() {
+	if ! command -v nvim >/dev/null 2>&1; then
+		print_warn "Neovim is not installed."
+		print_log "Installing Neovim through Homebrew ..."
+		print_line
+
+		if ! brew install neovim 2>&1; then
+			print_line
+			print_warn "Neovim installation has failed. Try to install manually with Homebrew."
+		else
+			print_line
+			print_ok "Neovim has been installed."
+		fi
+	else
+		print_ok "Neovim is already installed."
+	fi
+
+	create_file_symlink "$(pwd)/nvim" "$HOME/.config/nvim"
+
+	print_note "Remember to sync the plugins for neovim."
+}
+
 lazygit_check() {
 	if ! command -v lazygit >/dev/null 2>&1; then
-		print_error "LazyGit is not installed."
+		print_warn "LazyGit is not installed."
 		print_log "Installing LazyGit through Homebrew ..."
 		print_line
 
 		if ! brew install jesseduffield/lazygit/lazygit 2>&1; then
-			print_error "LazyGit installation has failed. Try to install manually with Homebrew."
-			return
+			print_line
+			print_warn "LazyGit installation has failed. Try to install manually with Homebrew."
+		else
+			print_line
+			print_ok "LazyGit has been successfully installed."
 		fi
-
-		print_line
-		print_ok "LazyGit has been successfully installed."
 	else
 		print_ok "LazyGit is already installed."
 	fi
 }
 
-brew_check
 zsh_check
+brew_check
 oh_my_posh_check
-nvim_check
 tmux_check
+nvim_check
 lazygit_check
