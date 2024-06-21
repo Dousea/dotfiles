@@ -100,7 +100,7 @@ export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || pr
 
 # Loads RVM
 [[ -f ~/.rvm/scripts/rvm ]] && source ~/.rvm/scripts/rvm
-source $(rvm env --path)
+[ -x "$(command -v rvm)" ] && source "$(rvm env --path)"
 
 # Autostart if not already in tmux and enabled.
 if [[ -z "$TMUX" ]]; then
@@ -111,4 +111,5 @@ if [[ -z "$TMUX" ]]; then
   fi
 fi
 
-eval "$(oh-my-posh init zsh --config "$HOME/.local/share/oh-my-posh/theme.omp.json")"
+# Oh My Posh
+[ -x "$(command -v oh-my-posh)" ] && eval "$(oh-my-posh init zsh --config "$HOME/.local/share/oh-my-posh/theme.omp.json")"
