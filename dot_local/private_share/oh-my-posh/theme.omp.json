@@ -1,0 +1,120 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "transient_prompt": {
+    "template": "➜ ",
+    "foreground": "lightGreen",
+    "background": "transparent",
+    "foreground_templates": [
+      "{{ if gt .Code 0 }}red{{ end }}"
+    ]
+  },
+  "blocks": [
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "properties": {
+            "cache_duration": "none",
+            "style": "agnoster"
+          },
+          "template": "\uf07b {{ .Path }} ",
+          "foreground": "cyan",
+          "type": "path",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": ":: {{ if .Error }}{{ .Error }}{{ else }}{{ if .Version }}\uf487 {{.Version}}{{ end }} {{ if .Name }}{{ .Name }}{{ end }}{{ end }} ",
+          "foreground": "#ffeb3b",
+          "type": "project",
+          "style": "powerline"
+        },
+        {
+          "properties": {
+            "cache_duration": "none",
+            "fetch_status": true
+          },
+          "template": ":: {{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Staging.Changed }} \uf046 {{ .Staging.String }}{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Working.Changed }} \uf044 {{ .Working.String }}{{ end }} ",
+          "foreground": "#F1502F",
+          "type": "git",
+          "style": "plain"
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "right",
+      "segments": [
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "| root ",
+          "foreground": "red",
+          "type": "root",
+          "style": "plain"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "| \ue791 {{ .Full }}",
+          "foreground": "#d84040",
+          "type": "ruby",
+          "style": "powerline"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "| \ue718 {{ if .PackageManagerIcon }}{{ .PackageManagerIcon }} {{ end }}{{ .Full }} ",
+          "foreground": "#6CA35E",
+          "type": "node",
+          "style": "powerline"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "| \ue71e {{ .Full }} ",
+          "foreground": "#ffeb3b",
+          "type": "npm",
+          "style": "powerline"
+        },
+        {
+          "properties": {
+            "cache_duration": "none"
+          },
+          "template": "| \uf308 {{ .Context }} ",
+          "foreground": "#0B59E7",
+          "type": "docker",
+          "style": "powerline"
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "properties": {
+            "always_enabled": true,
+            "cache_duration": "none"
+          },
+          "template": "➜ ",
+          "foreground": "lightGreen",
+          "type": "exit",
+          "style": "powerline",
+          "foreground_templates": [
+            "{{ if gt .Code 0 }}red{{ end }}"
+          ]
+        }
+      ],
+      "newline": true
+    }
+  ],
+  "version": 3
+}

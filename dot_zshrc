@@ -1,0 +1,119 @@
+[[ -n "$ZSH_DEBUGRC" ]] && zmodload zsh/zprof
+
+source "$HOME/.local/share/zinit/zinit.zsh"
+zinit light zsh-users/zsh-completions
+ZSH_AUTOSUGGEST_STRATEGY=completion
+zinit light zsh-users/zsh-autosuggestions
+zinit light jeffreytse/zsh-vi-mode
+zinit light akash329d/zsh-alias-finder
+zinit light zsh-users/zsh-syntax-highlighting
+zinit load 'zsh-users/zsh-history-substring-search'
+zinit ice wait atload'_history_substring_search_config'
+
+bindkey -v
+bindkey "$terminfo[kcuu1]" history-substring-search-up
+bindkey "$terminfo[kcud1]" history-substring-search-down
+bindkey -M emacs '^P' history-substring-search-up
+bindkey -M emacs '^N' history-substring-search-down
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
+
+function _wrapped_tmux() {
+  local -a tmux_cmd
+  tmux_cmd=(command tmux)
+  tmux_cmd+=(-u)
+
+  if [[ -n "$@" ]]; then
+    $tmux_cmd "$@"
+    return $?
+  fi
+
+  # Try to connect to an existing session.
+  $tmux_cmd attach -t my-session
+
+  # If failed, just run tmux.
+  if [[ $? -ne 0 ]]; then
+    tmux_cmd+=(-f "$HOME/.tmux.conf")
+    $tmux_cmd new-session -s my-session
+  fi
+
+  exit
+}
+
+# Alias tmux to our wrapper function.
+alias tmux=_wrapped_tmux
+
+# Add our aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+if [ -x "$(command -v lazygit)" ]; then
+  alias lzg='lazygit'
+fi
+
+if [ -x "$(command -v lazydocker)" ]; then
+  alias lzd='lazydocker'
+fi
+
+[[ -f ~/.aliasrc ]] && source ~/.aliasrc
+
+# Homebrew
+[ -x "$(command -v brew)" ] && eval "$(brew shellenv)"
+
+# Rust?
+[[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
+
+# Loads Mise
+[ -x "$(command -v mise)" ] && eval "$(mise activate zsh)"
+
+# Autostart if not already in tmux and enabled.
+if [[ -z "$TMUX" ]]; then
+  # Actually don't autostart if we already did and multiple autostarts are disabled.
+  if [[ "$ZSH_TMUX_AUTOSTARTED" != "true" ]]; then
+    export ZSH_TMUX_AUTOSTARTED=true
+    _wrapped_tmux
+  fi
+fi
+
+# Oh My Posh
+[ -x "$(command -v oh-my-posh)" ] && eval "$(oh-my-posh init zsh --config "$HOME/.local/share/oh-my-posh/theme.omp.json")"
+
+# pnpm
+export PNPM_HOME="/home/orlando/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+
+export PATH="$HOME/.phpenv/bin:$PATH"
+[ -x "$(command -v phpenv)" ] && eval "$(phpenv init -)"
+
+mkdir -p ~/.runtime
+export XDG_RUNTIME_DIR=~/.runtime
+chmod 777 $XDG_RUNTIME_DIR
+
+[ -x "$(command -v luarocks)" ] && eval "$(luarocks path --bin)"
+
+autoload -Uz colors && colors
+alias ls='ls --color=auto'
+alias dir='dir --color=auto'
+alias vdir='vdir --color=auto'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+
+autoload -Uz compinit && compinit
+zstyle ':completion::complete:*' use-cache on
+zstyle ':completion::complete:*' cache-path ~/.zsh/cache
+zstyle ':completion:*' completer _complete
+zstyle ':completion:*' matcher-list '' 'm:{a-z}={A-Z}' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=* l:|=*'
+_comp_options+=(globdots) # Include hidden files
+# Use the completions for tmux for our function
+compdef _tmux _wrapped_tmux
+
+eval "$(zoxide init zsh)"
+
+if [[ -n "$ZSH_DEBUGRC" ]]; then
+  zprof
+fi
