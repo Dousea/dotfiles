@@ -44,9 +44,16 @@ function _wrapped_tmux() {
 alias tmux=_wrapped_tmux
 
 # Add our aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
+if [ -x "$(command -v eza)" ]; then
+  alias eza='eza --icons=auto'
+  alias ls='eza'
+  alias ll='eza -alF'
+  alias la='eza -a'
+else
+  alias ll='ls -AlF'
+  alias la='ls -A'
+fi
+
 
 if [ -x "$(command -v lazygit)" ]; then
   alias lzg='lazygit'
@@ -96,7 +103,11 @@ chmod 777 $XDG_RUNTIME_DIR
 [ -x "$(command -v luarocks)" ] && eval "$(luarocks path --bin)"
 
 autoload -Uz colors && colors
-alias ls='ls --color=auto'
+
+if ! alias ls &>/dev/null; then
+  alias ls='ls --color=auto'
+fi
+
 alias dir='dir --color=auto'
 alias vdir='vdir --color=auto'
 alias grep='grep --color=auto'
@@ -104,6 +115,7 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
 autoload -Uz compinit && compinit
+
 zstyle ':completion::complete:*' use-cache on
 zstyle ':completion::complete:*' cache-path ~/.zsh/cache
 zstyle ':completion:*' completer _complete
