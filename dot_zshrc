@@ -65,16 +65,6 @@ fi
 
 [[ -f ~/.aliasrc ]] && source ~/.aliasrc
 
-
-# Autostart if not already in tmux and enabled.
-if [[ -z "$TMUX" ]]; then
-  # Actually don't autostart if we already did and multiple autostarts are disabled.
-  if [[ "$ZSH_TMUX_AUTOSTARTED" != "true" ]]; then
-    export ZSH_TMUX_AUTOSTARTED=true
-    _wrapped_tmux
-  fi
-fi
-
 # Oh My Posh
 [ -x "$(command -v oh-my-posh)" ] && eval "$(oh-my-posh init zsh --config "$HOME/.local/share/oh-my-posh/theme.omp.json")"
 

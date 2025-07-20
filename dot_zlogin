@@ -1,0 +1,11 @@
+# NOTE: Disable auto starting of tmux for now.
+# 
+# Autostart if not already in tmux and enabled.
+# if [[ -z "$TMUX" ]]; then
+#   # Actually don't autostart if we already did and multiple autostarts are disabled.
+#   if [[ "$ZSH_TMUX_AUTOSTARTED" != "true" ]]; then
+#     export ZSH_TMUX_AUTOSTARTED=true
+#     _wrapped_tmux
+#   fi
+# fi
+#
