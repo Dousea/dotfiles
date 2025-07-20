@@ -1,15 +1,26 @@
 #!/bin/bash
 
-sudo apt install build-essential procps curl file git
+{{ if eq .chezmoi.os "linux" }}
+# Linux-specific prerequisites
+sudo apt update
+sudo apt install -y build-essential procps curl file git
+{{ end }}
 
-if ! command -v brew >/dev/null 2>&1; then
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-fi
+# Install Homebrew (macOS or Linux)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
+# Initialize brew environment (required for Linuxbrew)
+{{ if eq .chezmoi.os "linux" }}
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+{{ else if eq .chezmoi.os "darwin" }}
+eval "$(/opt/homebrew/bin/brew shellenv)"
+{{ end }}
+
+# Install shared packages via Homebrew
 brew bundle --file=/dev/stdin <<EOF
 brew "zsh"
 brew "oh-my-posh"
 brew "tmux"
 brew "neovim"
-brew "jesseduffield/lazygit/lazygit"
+brew "lazygit"
 EOF
