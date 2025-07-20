@@ -65,14 +65,6 @@ fi
 
 [[ -f ~/.aliasrc ]] && source ~/.aliasrc
 
-# Homebrew
-[ -x "$(command -v brew)" ] && eval "$(brew shellenv)"
-
-# Rust?
-[[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
-
-# Loads Mise
-[ -x "$(command -v mise)" ] && eval "$(mise activate zsh)"
 
 # Autostart if not already in tmux and enabled.
 if [[ -z "$TMUX" ]]; then
@@ -85,22 +77,6 @@ fi
 
 # Oh My Posh
 [ -x "$(command -v oh-my-posh)" ] && eval "$(oh-my-posh init zsh --config "$HOME/.local/share/oh-my-posh/theme.omp.json")"
-
-# pnpm
-export PNPM_HOME="/home/orlando/.local/share/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-
-export PATH="$HOME/.phpenv/bin:$PATH"
-[ -x "$(command -v phpenv)" ] && eval "$(phpenv init -)"
-
-mkdir -p ~/.runtime
-export XDG_RUNTIME_DIR=~/.runtime
-chmod 777 $XDG_RUNTIME_DIR
-
-[ -x "$(command -v luarocks)" ] && eval "$(luarocks path --bin)"
 
 autoload -Uz colors && colors
 
