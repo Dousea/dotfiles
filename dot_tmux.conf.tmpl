@@ -73,8 +73,16 @@ bind-key -T copy-mode-vi p run "{ wl-paste --no-newline 2>/dev/null || xclip -o 
 {{- end }}
 
 bind-key r source-file ~/.tmux.conf\; display 'Reloaded tmux config.'
-# Pick or create a project session (see ~/.local/bin/tm)
+# Pick or create a project or SSH session (see ~/.local/bin/tm)
 bind-key f display-popup -E -w 80% -h 60% tm
+bind-key b switch-client -l
+# Cheat sheet; the full key list is :list-keys
+bind-key ? display-popup -T " cheat sheet " -w 94 -h 16 "cat ~/.config/tmux/cheatsheet.txt"
+
+# SSH sessions from tm hide this tmux's status bar and use C-b as its prefix,
+# leaving C-a to the remote tmux. Say so when entering one.
+set-hook -g client-session-changed { if -F '#{@ssh}' { display-message -d 4000 '#S · this tmux is C-b here: C-b f sessions · C-b b back · C-b ? help' } }
+set-hook -g client-attached { if -F '#{@ssh}' { display-message -d 4000 '#S · this tmux is C-b here: C-b f sessions · C-b b back · C-b ? help' } }
 
 set -g mode-keys vi
 set -g status-keys vi
@@ -104,15 +112,17 @@ set -g status-left "{{ $off }}{{ $sync }}#[fg=black,bg=red] #S #[fg=red,bg=black
 set -g status-left "{{ $off }}#{tmux_mode_indicator}#[fg=black,bg=red] #S #[fg=red,bg=black]"
 {{- end }}
 set -g status-left-length 40
+{{- /* A dim tip that changes every 10 minutes on wide terminals; :set @tips off hides it */}}
+{{- $tip := "#{?#{&&:#{!=:#{@tips},off},#{e|>=:#{client_width},170}},#[fg=colour240]#(~/.config/tmux/tip.sh)  ,}" }}
 {{- $dir := printf "#[fg=colour245]#{=/-40/…:#{s|^%s|~|:pane_current_path}} " .chezmoi.homeDir }}
 {{- $host := printf "#[fg=black,bg=%s,bold] #{@ssh_marker}#h " $hostColor }}
 {{- if eq .profile "minimal" }}
-set -g status-right "{{ $dir }}#[fg={{ $hostColor }},bg=black]{{ $host }}"
+set -g status-right "{{ $tip }}{{ $dir }}#[fg={{ $hostColor }},bg=black]{{ $host }}"
 {{- else }}
 # You need CMake for status below to work!
-set -g status-right "{{ $dir }}#[fg=blue,bg=black]#[fg=black,bg=blue] #(~/.tmux/plugins/tmux-mem-cpu-load/tmux-mem-cpu-load --interval 1) #[fg={{ $hostColor }},bg=blue]{{ $host }}"
+set -g status-right "{{ $tip }}{{ $dir }}#[fg=blue,bg=black]#[fg=black,bg=blue] #(~/.tmux/plugins/tmux-mem-cpu-load/tmux-mem-cpu-load --interval 1) #[fg={{ $hostColor }},bg=blue]{{ $host }}"
 {{- end }}
-set -g status-right-length 120
+set -g status-right-length 180
 set -g status-justify centre
 # Windows running ssh show the remote host's title instead of "ssh"
 {{- $name := "#{?#{&&:#{==:#{pane_current_command},ssh},#{!=:#{pane_title},#{host}}},#{pane_title},#W}" }}

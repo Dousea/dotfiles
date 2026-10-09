@@ -1,0 +1,18 @@
+C-a f opens any project, server or session
+C-a b jumps back to the previous session
+tm <host> opens an SSH session; C-b talks to the local tmux there
+C-a z zooms the current pane, C-a z again restores it
+C-a s shows every session and window with a preview
+C-a ? shows the cheat sheet
+C-a $ renames the current session
+C-a , renames the current window
+C-a [ starts copy mode: v selects, {{ if eq .profile "minimal" }}Enter{{ else }}y{{ end }} copies
+Shift+drag selects text with the terminal instead of tmux
+F12 hands all keys to a nested tmux
+:set @tips off hides these tips
+{{- if ne .profile "minimal" }}
+C-a | and C-a - split the pane beside or below
+C-a h/j/k/l moves between panes, C-a H/J/K/L resizes them
+C-a < and C-a > move the current window left or right
+Sessions are saved every 15 minutes and restored after a reboot
+{{- end }}

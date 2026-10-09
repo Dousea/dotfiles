@@ -108,7 +108,11 @@ Machine-specific aliases go in `~/.aliasrc`, which isn't managed here.
   or one of zoxide's directories with fzf, and opens a session for it. `tm
   <host>` connects straight to a known SSH host; any other `tm <query>` jumps to
   the best zoxide match. An SSH session closes when the connection ends. Move
-  between sessions with `C-a s` (tree), `C-a (` / `C-a )` and `C-a L` (last).
+  between sessions with `C-a s` (tree), `C-a (` / `C-a )` and `C-a b` (back).
+- In an SSH session opened by `tm`, only the server's tmux is visible and `C-a`
+  goes to it; the local tmux is `C-b` there (`C-b f`, `C-b b`).
+- `C-a ?` shows a cheat sheet. Wide terminals show a dim tip in the status bar;
+  `C-a :set @tips off` hides it.
 - With the `full` profile, sessions are saved every 15 minutes and restored when
   tmux starts again, e.g. after a reboot.
 - `F12` switches the local tmux's keys off, so they reach a tmux running over

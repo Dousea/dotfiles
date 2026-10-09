@@ -64,6 +64,9 @@ if [[ -n "$host" ]]; then
     # Keep the session open if ssh fails, so the error stays readable.
     tmux new-session -d -s "$name" \
       "ssh $(printf '%q' "$host") || { echo 'ssh failed; press Enter to close'; read _; }"
+    # Show only the remote tmux: hide this one's status bar and move its prefix
+    # to C-b so C-a reaches the remote (see the hooks in ~/.tmux.conf).
+    tmux set -t "=$name:" status off \; set -t "=$name:" prefix C-b \; set -t "=$name:" @ssh on
   fi
 elif [[ -n "$dir" ]]; then
   name=$(session_name "$(basename "$dir")")

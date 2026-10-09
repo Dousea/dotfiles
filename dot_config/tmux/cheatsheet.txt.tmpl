@@ -1,0 +1,17 @@
+ Sessions  C-a f  pick or open (tm)     C-a b  back to last     C-a s  tree
+           C-a (  C-a )  prev / next    C-a $  rename           C-a d  detach
+ SSH       tm sessions hide this tmux; use C-b for it there (C-b f, C-b b)
+           F12  hand all keys to a nested tmux, F12 again to take them back
+ Windows   C-a c  new                   C-a n  C-a p  next / prev    C-a ,  rename
+{{- if eq .profile "minimal" }}
+ Panes     C-a %  C-a "  split          C-a arrows  move        C-a z  zoom
+{{- else }}
+ Panes     C-a |  C-a -  split          C-a h/j/k/l  move       C-a z  zoom
+           C-a H/J/K/L  resize          C-a x  close            C-a <  C-a >  swap windows
+{{- end }}
+ Copy      C-a [  then v to select, {{ if eq .profile "minimal" }}Enter{{ else }}y{{ end }} to copy, q to quit
+           Shift+drag selects with the terminal instead of tmux
+ Misc      C-a r  reload config{{ if ne .profile "minimal" }}    C-a I  install plugins    C-a U  update plugins{{ end }}
+           C-a :list-keys  every key binding
+
+ Press q or Escape to close
