@@ -10,6 +10,8 @@ C-a [ starts copy mode: v selects, {{ if eq .profile "minimal" }}Enter{{ else }}
 Shift+drag selects text with the terminal instead of tmux
 F12 hands all keys to a nested tmux
 :set @tips off hides these tips
+C-h/j/k/l moves between tmux panes and Neovim splits alike
+C-a C-l clears the screen, since C-l moves between panes
 {{- if ne .profile "minimal" }}
 C-a | and C-a - split the pane beside or below
 C-a h/j/k/l moves between panes, C-a H/J/K/L resizes them
