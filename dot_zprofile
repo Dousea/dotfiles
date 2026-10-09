@@ -1,5 +1,7 @@
+export PATH="$HOME/.local/bin:$PATH"
+
 # Homebrew
-[ -x "$(command -v brew)" ] && eval "$(brew shellenv)"
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" 
 
 # Rust
 [[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
@@ -17,11 +19,6 @@ esac
 # PHP
 export PATH="$HOME/.phpenv/bin:$PATH"
 [ -x "$(command -v phpenv)" ] && eval "$(phpenv init -)"
-
-# Runtime dir (needed in some cases for XDG compliance)
-mkdir -p ~/.runtime
-export XDG_RUNTIME_DIR=~/.runtime
-chmod 777 $XDG_RUNTIME_DIR
 
 # LuaRocks
 [ -x "$(command -v luarocks)" ] && eval "$(luarocks path --bin)"
