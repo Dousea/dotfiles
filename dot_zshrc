@@ -49,13 +49,19 @@ zinit light zsh-users/zsh-syntax-highlighting
 zinit snippet OMZ::plugins/git/git.plugin.zsh
 zinit load 'zsh-users/zsh-history-substring-search'
 
-bindkey -v
-bindkey "$terminfo[kcuu1]" history-substring-search-up
-bindkey "$terminfo[kcud1]" history-substring-search-down
-bindkey -M emacs '^P' history-substring-search-up
-bindkey -M emacs '^N' history-substring-search-down
-bindkey -M vicmd 'k' history-substring-search-up
-bindkey -M vicmd 'j' history-substring-search-down
+# zsh-vi-mode resets keymaps when it initializes, so bindings must be applied
+# from its hooks. Arrow keys send ^[[A or ^[OA depending on keypad mode.
+function zvm_after_init() {
+  bindkey '^[[A' history-substring-search-up
+  bindkey '^[[B' history-substring-search-down
+  bindkey '^[OA' history-substring-search-up
+  bindkey '^[OB' history-substring-search-down
+}
+
+function zvm_after_lazy_keybindings() {
+  bindkey -M vicmd 'k' history-substring-search-up
+  bindkey -M vicmd 'j' history-substring-search-down
+}
 
 function _wrapped_tmux() {
   local -a tmux_cmd
