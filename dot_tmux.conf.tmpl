@@ -4,6 +4,7 @@
 {{-     $wsl = true -}}
 {{-   end -}}
 {{- end -}}
+{{ if ne .profile "minimal" -}}
 # List of plugins
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-sensible'
@@ -13,6 +14,7 @@ set -g @plugin 'tmux-plugins/tmux-yank'
 set -g @plugin 'thewtex/tmux-mem-cpu-load'
 set -g @plugin 'jlipps/tmux-safekill'
 
+{{ end -}}
 set-option -g default-command "${SHELL}"
 set-option -g base-index 1
 set-option -g renumber-windows on
@@ -29,9 +31,14 @@ set -g default-terminal "tmux-256color"
 {{- end }}
 set -as terminal-features ",xterm-256color:RGB"
 
+{{ if eq .profile "workstation" -}}
 unbind C-b
 set -g prefix C-a
 bind C-a send-prefix
+{{- else -}}
+# Servers keep the default C-b prefix, so a remote tmux inside the local one
+# (prefix C-a) can be driven separately.
+{{- end }}
 
 # tmux-yank detects pbcopy, wl-copy and xclip by itself; only WSL needs help.
 set -g @yank_action 'copy-pipe'
@@ -54,10 +61,18 @@ bind-key -T copy-mode-vi V send -X select-line
 set -g status-fg white
 set -g status-bg black
 set -g status-interval 1
+{{- if eq .profile "minimal" }}
+set -g status-left "#[fg=black,bg=red] #S #[fg=red,bg=black]"
+{{- else }}
 set -g status-left "#{tmux_mode_indicator}#[fg=black,bg=red] #S #[fg=red,bg=black]"
+{{- end }}
 set -g status-left-length 20
+{{- if eq .profile "minimal" }}
+set -g status-right "#[fg=blue,bg=black]#[fg=black,bg=blue] #H "
+{{- else }}
 # You need CMake for status below to work!
 set -g status-right "#[fg=blue,bg=black]#[fg=black,bg=blue] #(~/.tmux/plugins/tmux-mem-cpu-load/tmux-mem-cpu-load --interval 1) "
+{{- end }}
 set -g status-right-length 60
 set -g status-justify centre
 set -g window-status-format " #I:#W#{?window_flags,#{window_flags}, } "
@@ -65,6 +80,8 @@ set -g window-status-current-format " #I:#W#{?window_flags,#{window_flags}, } "
 set -g window-status-style fg=green,bg=black
 set -g window-status-current-style fg=black,bg=green
 set -g window-status-separator ""
+{{- if ne .profile "minimal" }}
 
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
 run '~/.tmux/plugins/tpm/tpm'
+{{- end }}
