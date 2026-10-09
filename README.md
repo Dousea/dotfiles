@@ -1,0 +1,109 @@
+# dotfiles
+
+My shell setup, managed with [chezmoi](https://www.chezmoi.io): zsh, tmux, Neovim
+([Dousea/nvim](https://github.com/Dousea/nvim)) and a handful of CLI tools.
+
+Supported: Fedora, Debian/Ubuntu (including WSL and Proxmox), macOS.
+
+## Setup from a fresh shell
+
+### 1. Install `curl` and `git`
+
+```sh
+sudo apt-get update && sudo apt-get install -y curl git    # Debian/Ubuntu
+sudo dnf install -y curl git                               # Fedora
+xcode-select --install                                     # macOS (for git)
+```
+
+On a root shell (e.g. Proxmox), drop the `sudo`.
+
+### 2. Install chezmoi and apply the dotfiles
+
+```sh
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b ~/.local/bin init --apply Dousea
+```
+
+This installs chezmoi to `~/.local/bin`, clones this repo to
+`~/.local/share/chezmoi` and applies it. Along the way it:
+
+1. Asks for the machine profile (see [Profiles](#profiles)). Press Enter for `full`.
+2. Installs packages with `dnf`, `apt-get` or Homebrew (asks for your `sudo`
+   password): zsh, tmux, git, fzf, ripgrep, fd, bat, btop, ncdu and build tools.
+   On macOS it installs Homebrew first if it's missing.
+3. Installs [mise](https://mise.jdx.dev) and the tools in
+   `~/.config/mise/config.toml`: Neovim, eza, zoxide, oh-my-posh, lazygit,
+   lazydocker, uv and Node LTS.
+4. Clones the Neovim config, zinit and tpm.
+
+If a step fails, fix the cause and run `~/.local/bin/chezmoi apply` again.
+
+### 3. Make zsh your login shell
+
+```sh
+chsh -s "$(command -v zsh)"
+```
+
+As root, or for another user: `sudo chsh -s "$(command -v zsh)" <user>`.
+
+If `chsh` says the user doesn't exist in `/etc/passwd` (accounts managed by a
+cloud provider, e.g. Google Cloud OS Login), start zsh from bash instead by
+adding this to the end of `~/.bashrc`:
+
+```sh
+[[ $- == *i* && -x /usr/bin/zsh && -z $ZSH_VERSION ]] && exec /usr/bin/zsh -l
+```
+
+### 4. Log out and back in
+
+The first zsh start takes a few seconds while zinit downloads the plugins.
+Over SSH, tmux starts automatically in a session called `my-session`.
+
+### 5. Install the tmux plugins (`full` profile)
+
+Inside tmux, press `C-a` then `I` (capital i).
+
+### 6. Open Neovim once (`full` profile)
+
+Run `nvim` and wait for lazy.nvim to install the plugins, then quit and reopen.
+Mason then installs the language servers and formatters in the background.
+
+### 7. Use a Nerd Font in your terminal
+
+The prompt and the tmux status bar use [Nerd Font](https://www.nerdfonts.com)
+icons. Set one in the terminal you connect *from*; nothing needs installing on
+remote machines.
+
+## Profiles
+
+| | `full` (default) | `minimal` |
+| --- | --- | --- |
+| zsh plugins | zinit | the distro's `zsh-autosuggestions` and `zsh-syntax-highlighting` |
+| tmux plugins | tpm, with CPU/memory in the status bar | none, hostname in the status bar |
+| Neovim config | yes | no |
+| C/C++ build tools | yes | no |
+| mise tools | yes | yes |
+
+To switch, change `profile` in `~/.config/chezmoi/chezmoi.toml` and run
+`chezmoi apply`.
+
+## Day to day
+
+| Command | What it does |
+| --- | --- |
+| `chezmoi update` (`cz update`) | pull this repo and apply it |
+| `chezmoi edit <file>` (`cze`) | edit the source of a managed file |
+| `chezmoi diff` (`czd`) | show what `apply` would change |
+| `chezmoi apply` (`cza`) | apply the source to `$HOME` |
+| `chezmoi cd` (`czcd`) | open a shell in the source repo |
+| `mise upgrade` | update the mise-managed tools |
+
+Machine-specific aliases go in `~/.aliasrc`, which isn't managed here.
+
+## tmux
+
+- The prefix is `C-a`.
+- `F12` switches the local tmux's keys off, so they reach a tmux running over
+  SSH inside it. Press `F12` again to switch them back on.
+- Copying from a remote tmux uses OSC 52, which needs a terminal that supports
+  it (e.g. kitty, foot, WezTerm, Ghostty). VTE terminals (GNOME Terminal,
+  Ptyxis) don't; hold Shift while selecting to use the terminal's own selection.
