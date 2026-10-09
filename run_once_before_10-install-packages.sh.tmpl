@@ -29,7 +29,8 @@ case "$(uname -s)" in
         else
           packages+=(build-essential cmake)
         fi
-        $SUDO apt-get update
+        # A broken third-party repo shouldn't block installing from the rest
+        $SUDO apt-get update || echo "warning: apt-get update failed, using cached package lists" >&2
         $SUDO apt-get install -y "${packages[@]}"
         ;;
       *)
