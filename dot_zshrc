@@ -77,41 +77,32 @@ function _wrapped_tmux() {
 alias tmux=_wrapped_tmux
 
 # Add our aliases
-if [ -x "$(command -v eza)" ]; then
+if (( $+commands[eza] )); then
   alias eza='eza --icons=auto'
   alias ls='eza'
   alias ll='eza -alF'
   alias la='eza -a'
 else
+  alias ls='ls --color=auto'
   alias ll='ls -AlF'
   alias la='ls -A'
 fi
 
-
-if [ -x "$(command -v lazygit)" ]; then
-  alias lzg='lazygit'
-fi
-
-if [ -x "$(command -v lazydocker)" ]; then
-  alias lzd='lazydocker'
-fi
+(( $+commands[lazygit] )) && alias lzg='lazygit'
+(( $+commands[lazydocker] )) && alias lzd='lazydocker'
 
 [[ -f ~/.aliasrc ]] && source ~/.aliasrc
 
 # Oh My Posh
-[ -x "$(command -v oh-my-posh)" ] && eval "$(oh-my-posh init zsh --config "$HOME/.local/share/oh-my-posh/theme.omp.json")"
+(( $+commands[oh-my-posh] )) && eval "$(oh-my-posh init zsh --config "$HOME/.local/share/oh-my-posh/theme.omp.json")"
 
 autoload -Uz colors && colors
 
-if ! alias ls &>/dev/null; then
-  alias ls='ls --color=auto'
-fi
-
-alias dir='dir --color=auto'
-alias vdir='vdir --color=auto'
 alias grep='grep --color=auto'
-alias fgrep='fgrep --color=auto'
-alias egrep='egrep --color=auto'
+if [[ "$OSTYPE" != darwin* ]]; then
+  alias dir='dir --color=auto'
+  alias vdir='vdir --color=auto'
+fi
 
 zstyle ':completion::complete:*' use-cache on
 zstyle ':completion::complete:*' cache-path ~/.zsh/cache
