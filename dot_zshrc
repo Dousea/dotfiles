@@ -235,11 +235,7 @@ _cache_completion mise mise mise completion zsh
 _cache_completion uv uv uv generate-shell-completion zsh
 _cache_completion uvx uvx uvx --generate-shell-completion zsh
 _cache_completion lazygit lazygit _lazygit_completion
-if (( $+commands[bat] )); then
-  _cache_completion bat bat bat --completion zsh
-else
-  _cache_completion bat batcat batcat --completion zsh
-fi
+_cache_completion bat bat bat --completion zsh
 unfunction _cache_completion _lazygit_completion
 
 # Also pick up completions that mise-installed tools ship (e.g. zoxide).
@@ -257,9 +253,8 @@ _comp_options+=(globdots) # Include hidden files
 # Use the completions for tmux for our function
 compdef _tmux _wrapped_tmux
 compdef _directories mkcd
-# Debian's names for fd and bat
+# Debian's name for fd
 (( $+commands[fdfind] )) && compdef fdfind=fd
-(( $+commands[batcat] )) && compdef batcat=bat
 
 # Tool hooks, in .zshrc so non-login shells (e.g. tmux panes) get them too.
 (( $+commands[phpenv] )) && eval "$(phpenv init -)"
