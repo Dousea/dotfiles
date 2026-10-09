@@ -41,7 +41,7 @@ setopt CORRECT NO_CORRECT_ALL
 
 source "$HOME/.local/share/zinit/zinit.zsh"
 zinit light zsh-users/zsh-completions
-ZSH_AUTOSUGGEST_STRATEGY=completion
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 zinit light zsh-users/zsh-autosuggestions
 zinit light jeffreytse/zsh-vi-mode
 zinit light akash329d/zsh-alias-finder
