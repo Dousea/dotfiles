@@ -39,29 +39,71 @@ setopt NO_BEEP
 # Try to correct the spelling of commands.
 setopt CORRECT NO_CORRECT_ALL
 
-source "$HOME/.local/share/zinit/zinit.zsh"
-zinit light zsh-users/zsh-completions
+# Activate mise first so the tools it manages are on PATH for the checks below.
+(( $+commands[mise] )) && eval "$(mise activate zsh)"
+
+# fzf key bindings (Ctrl-R history, Ctrl-T files). Older fzf releases lack
+# `fzf --zsh` and ship the script under /usr/share instead. Uses whence because
+# zsh-vi-mode runs its hooks with a local $commands that shadows zsh's.
+function _load_fzf_bindings() {
+  whence -p fzf >/dev/null || return
+  local fzf_init="$(fzf --zsh 2>/dev/null)"
+  if [[ -n "$fzf_init" ]]; then
+    eval "$fzf_init"
+    return
+  fi
+  local script
+  for script in /usr/share/doc/fzf/examples/key-bindings.zsh /usr/share/fzf/shell/key-bindings.zsh; do
+    [[ -r "$script" ]] && source "$script" && return
+  done
+}
+
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-zinit light zsh-users/zsh-autosuggestions
-zinit light jeffreytse/zsh-vi-mode
-zinit light akash329d/zsh-alias-finder
-zinit light zsh-users/zsh-syntax-highlighting
-zinit snippet OMZ::plugins/git/git.plugin.zsh
-zinit load 'zsh-users/zsh-history-substring-search'
 
-# zsh-vi-mode resets keymaps when it initializes, so bindings must be applied
-# from its hooks. Arrow keys send ^[[A or ^[OA depending on keypad mode.
-function zvm_after_init() {
-  bindkey '^[[A' history-substring-search-up
-  bindkey '^[[B' history-substring-search-down
-  bindkey '^[OA' history-substring-search-up
-  bindkey '^[OB' history-substring-search-down
-}
+if [[ -r "$HOME/.local/share/zinit/zinit.zsh" ]]; then
+  source "$HOME/.local/share/zinit/zinit.zsh"
+  zinit light zsh-users/zsh-completions
+  zinit light zsh-users/zsh-autosuggestions
+  zinit light jeffreytse/zsh-vi-mode
+  zinit light akash329d/zsh-alias-finder
+  zinit light zsh-users/zsh-syntax-highlighting
+  zinit snippet OMZ::plugins/git/git.plugin.zsh
+  zinit load 'zsh-users/zsh-history-substring-search'
 
-function zvm_after_lazy_keybindings() {
-  bindkey -M vicmd 'k' history-substring-search-up
-  bindkey -M vicmd 'j' history-substring-search-down
-}
+  # zsh-vi-mode resets keymaps when it initializes, so bindings must be applied
+  # from its hooks. Arrow keys send ^[[A or ^[OA depending on keypad mode.
+  function zvm_after_init() {
+    bindkey '^[[A' history-substring-search-up
+    bindkey '^[[B' history-substring-search-down
+    bindkey '^[OA' history-substring-search-up
+    bindkey '^[OB' history-substring-search-down
+    _load_fzf_bindings
+  }
+
+  function zvm_after_lazy_keybindings() {
+    bindkey -M vicmd 'k' history-substring-search-up
+    bindkey -M vicmd 'j' history-substring-search-down
+  }
+else
+  # Without zinit (the minimal profile), use the distro's plugin packages and
+  # zsh's built-in prefix history search.
+  bindkey -v
+  autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
+  zle -N up-line-or-beginning-search
+  zle -N down-line-or-beginning-search
+  bindkey '^[[A' up-line-or-beginning-search
+  bindkey '^[[B' down-line-or-beginning-search
+  bindkey '^[OA' up-line-or-beginning-search
+  bindkey '^[OB' down-line-or-beginning-search
+  bindkey -M vicmd 'k' up-line-or-beginning-search
+  bindkey -M vicmd 'j' down-line-or-beginning-search
+  _load_fzf_bindings
+
+  for plugin in zsh-autosuggestions zsh-syntax-highlighting; do
+    [[ -r "/usr/share/$plugin/$plugin.zsh" ]] && source "/usr/share/$plugin/$plugin.zsh"
+  done
+  unset plugin
+fi
 
 function _wrapped_tmux() {
   if (( $# )); then
@@ -88,6 +130,10 @@ else
   alias la='ls -A'
 fi
 
+# Debian installs these as fdfind and batcat.
+(( $+commands[fdfind] && ! $+commands[fd] )) && alias fd='fdfind'
+(( $+commands[batcat] && ! $+commands[bat] )) && alias bat='batcat'
+
 (( $+commands[lazygit] )) && alias lzg='lazygit'
 (( $+commands[lazydocker] )) && alias lzd='lazydocker'
 
@@ -111,14 +157,13 @@ zstyle ':completion:*' matcher-list '' 'm:{a-z}={A-Z}' 'm:{a-zA-Z}={A-Za-z}' 'r:
 
 autoload -Uz compinit && compinit
 # Replay the compdefs zinit deferred from plugins loaded before compinit.
-zinit cdreplay -q
+(( $+functions[zinit] )) && zinit cdreplay -q
 _comp_options+=(globdots) # Include hidden files
 # Use the completions for tmux for our function
 compdef _tmux _wrapped_tmux
 
 # Tool hooks (here rather than .zprofile so tmux panes, which are non-login
 # shells, get them too)
-(( $+commands[mise] )) && eval "$(mise activate zsh)"
 (( $+commands[phpenv] )) && eval "$(phpenv init -)"
 (( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
 
