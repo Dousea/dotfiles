@@ -9,26 +9,57 @@
 # the client from inside it.
 set -euo pipefail
 
-# SSH destinations from ~/.ssh/config and zsh history, most used first.
+# Hosts to leave out: they're for git, not for logging in.
+is_git_host() {
+  [[ "$1" =~ (^|@)(github\.com|gitlab\.com)$ || "$1" == git@* ]]
+}
+
+# The user@hostname that ssh would actually connect to.
+ssh_target() {
+  ssh -G -- "$1" 2>/dev/null | awk '$1 == "user" { u = $2 } $1 == "hostname" { h = $2 } END { print u "@" h }'
+}
+
+# SSH destinations: ~/.ssh/config hosts first, then zsh history, most used
+# first. History entries that a config host already covers, or whose hostname
+# no longer resolves, are left out.
 ssh_hosts() {
-  {
-    if [[ -r ~/.ssh/config ]]; then
-      awk 'tolower($1) == "host" { for (i = 2; i <= NF; i++) if ($i !~ /[*?!]/) print $i }' ~/.ssh/config
+  local -A seen=()
+  local host target hostname
+
+  if [[ -r ~/.ssh/config ]]; then
+    while read -r host; do
+      is_git_host "$host" && continue
+      target=$(ssh_target "$host")
+      [[ -n "${seen[$target]:-}" ]] && continue
+      seen[$target]=1
+      printf '%s\n' "$host"
+    done < <(awk 'tolower($1) == "host" { for (i = 2; i <= NF; i++) if ($i !~ /[*?!]/) print $i }' ~/.ssh/config)
+  fi
+
+  [[ -r "${HISTFILE:-$HOME/.zsh_history}" ]] || return 0
+  while read -r host; do
+    is_git_host "$host" && continue
+    target=$(ssh_target "$host")
+    [[ -n "${seen[$target]:-}" ]] && continue
+    seen[$target]=1
+    hostname=${target#*@}
+    if [[ ! "$hostname" =~ ^[0-9.]+$|: ]] && ! timeout 0.5 getent hosts "$hostname" >/dev/null; then
+      continue
     fi
-    if [[ -r "${HISTFILE:-$HOME/.zsh_history}" ]]; then
-      sed -E 's/^: [0-9]+:[0-9]+;//' "${HISTFILE:-$HOME/.zsh_history}" |
-        awk '$1 == "ssh" {
-          # Skip options, and the values of options that take one.
-          for (i = 2; i <= NF; i++) {
-            if ($i ~ /^-[BbcDEeFIiJLlmOoPpQRSWw]$/) { i++; continue }
-            if ($i ~ /^-/) continue
-            print $i
-            break
-          }
-        }'
-    fi
-  } | { grep -Ev '(^|@)(github\.com|gitlab\.com)$|^git@' || true; } |
-    sort | uniq -c | sort -rn | awk '{ print $2 }'
+    printf '%s\n' "$host"
+  done < <(
+    sed -E 's/^: [0-9]+:[0-9]+;//' "${HISTFILE:-$HOME/.zsh_history}" |
+      awk '$1 == "ssh" {
+        # Skip options, and the values of options that take one.
+        for (i = 2; i <= NF; i++) {
+          if ($i ~ /^-[BbcDEeFIiJLlmOoPpQRSWw]$/) { i++; continue }
+          if ($i ~ /^-/) continue
+          print $i
+          break
+        }
+      }' |
+      sort | uniq -c | sort -rn | awk '{ print $2 }'
+  )
 }
 
 # tmux doesn't allow . or : in session names
