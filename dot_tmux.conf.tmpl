@@ -4,6 +4,9 @@
 {{-     $wsl = true -}}
 {{-   end -}}
 {{- end -}}
+{{- /* Each machine gets its own status bar color, picked from its hostname. */ -}}
+{{- $hostColors := list "colour39" "colour43" "colour76" "colour111" "colour141" "colour170" "colour208" "colour216" -}}
+{{- $hostColor := index $hostColors (mod (atoi (adler32sum .chezmoi.hostname)) (len $hostColors)) -}}
 {{ if ne .profile "minimal" -}}
 # List of plugins
 set -g @plugin 'tmux-plugins/tpm'
@@ -71,22 +74,40 @@ bind-key -T copy-mode-vi V send -X select-line
 set -g status-fg white
 set -g status-bg black
 set -g status-interval 1
+# Dark red status bar when tmux runs as root
+if -F '#{==:#{uid},0}' 'set -g status-bg colour52'
+
+# Mark the hostname when this tmux was started from an SSH login (see ~/.zlogin)
+if-shell '[ -n "$SSH_CONNECTION" ]' 'set -g @ssh_marker "ssh "' 'set -g @ssh_marker ""'
+
+# Name the outer terminal after this host, so a tmux running SSH into this one
+# can show it on the window tab (see window-status-format below)
+set -g set-titles on
+set -g set-titles-string "#h"
+
+{{- $off := "#{?#{==:#{client_key_table},off},#[fg=black#,bg=yellow] OFF ,}" }}
+{{- /* tmux-mode-indicator shows SYNC itself in the full profile */}}
+{{- $sync := "#{?synchronize-panes,#[fg=white#,bg=red#,bold] SYNC #[default],}" }}
 {{- if eq .profile "minimal" }}
-set -g status-left "#{?#{==:#{client_key_table},off},#[fg=black#,bg=yellow] OFF ,}#[fg=black,bg=red] #S #[fg=red,bg=black]"
+set -g status-left "{{ $off }}{{ $sync }}#[fg=black,bg=red] #S #[fg=red,bg=black]"
 {{- else }}
-set -g status-left "#{?#{==:#{client_key_table},off},#[fg=black#,bg=yellow] OFF ,}#{tmux_mode_indicator}#[fg=black,bg=red] #S #[fg=red,bg=black]"
+set -g status-left "{{ $off }}#{tmux_mode_indicator}#[fg=black,bg=red] #S #[fg=red,bg=black]"
 {{- end }}
-set -g status-left-length 30
+set -g status-left-length 40
+{{- $dir := printf "#[fg=colour245]#{=/-40/…:#{s|^%s|~|:pane_current_path}} " .chezmoi.homeDir }}
+{{- $host := printf "#[fg=black,bg=%s,bold] #{@ssh_marker}#h " $hostColor }}
 {{- if eq .profile "minimal" }}
-set -g status-right "#[fg=blue,bg=black]#[fg=black,bg=blue] #H "
+set -g status-right "{{ $dir }}#[fg={{ $hostColor }},bg=black]{{ $host }}"
 {{- else }}
 # You need CMake for status below to work!
-set -g status-right "#[fg=blue,bg=black]#[fg=black,bg=blue] #(~/.tmux/plugins/tmux-mem-cpu-load/tmux-mem-cpu-load --interval 1) "
+set -g status-right "{{ $dir }}#[fg=blue,bg=black]#[fg=black,bg=blue] #(~/.tmux/plugins/tmux-mem-cpu-load/tmux-mem-cpu-load --interval 1) #[fg={{ $hostColor }},bg=blue]{{ $host }}"
 {{- end }}
-set -g status-right-length 60
+set -g status-right-length 120
 set -g status-justify centre
-set -g window-status-format " #I:#W#{?window_flags,#{window_flags}, } "
-set -g window-status-current-format " #I:#W#{?window_flags,#{window_flags}, } "
+# Windows running ssh show the remote host's title instead of "ssh"
+{{- $name := "#{?#{&&:#{==:#{pane_current_command},ssh},#{!=:#{pane_title},#{host}}},#{pane_title},#W}" }}
+set -g window-status-format " #I:{{ $name }}#{?window_flags,#{window_flags}, } "
+set -g window-status-current-format " #I:{{ $name }}#{?window_flags,#{window_flags}, } "
 set -g window-status-style fg=green,bg=black
 set -g window-status-current-style fg=black,bg=green
 set -g window-status-separator ""
