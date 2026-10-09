@@ -124,6 +124,7 @@ if (( $+commands[eza] )); then
   alias ls='eza'
   alias ll='eza -alF'
   alias la='eza -a'
+  alias lt='eza --tree --level=2'
 else
   alias ls='ls --color=auto'
   alias ll='ls -AlF'
@@ -132,10 +133,50 @@ fi
 
 # Debian installs these as fdfind and batcat.
 (( $+commands[fdfind] && ! $+commands[fd] )) && alias fd='fdfind'
-(( $+commands[batcat] && ! $+commands[bat] )) && alias bat='batcat'
+if (( $+commands[bat] )); then
+  alias cat='bat --paging=never'
+elif (( $+commands[batcat] )); then
+  alias bat='batcat'
+  alias cat='batcat --paging=never'
+fi
 
 (( $+commands[lazygit] )) && alias lzg='lazygit'
 (( $+commands[lazydocker] )) && alias lzd='lazydocker'
+(( $+commands[nvim] )) && alias vim='nvim'
+
+# Navigation
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias -- -='cd -'
+alias reload='exec zsh'
+alias path='print -l $path'
+
+function mkcd() {
+  mkdir -p -- "$1" && cd -- "$1"
+}
+
+if (( $+commands[chezmoi] )); then
+  alias cz='chezmoi'
+  alias czd='chezmoi diff'
+  alias cza='chezmoi apply'
+  alias cze='chezmoi edit'
+  alias czcd='chezmoi cd'
+fi
+
+# Human-readable sizes and colored output for system tools.
+alias df='df -h'
+alias du='du -h'
+(( $+commands[free] )) && alias free='free -h'
+(( $+commands[ip] )) && alias ip='ip -color=auto'
+(( $+commands[ss] )) && alias ports='ss -tulpn'
+
+# As root, confirm before overwriting or deleting.
+if (( EUID == 0 )); then
+  alias rm='rm -i'
+  alias cp='cp -i'
+  alias mv='mv -i'
+fi
 
 [[ -f ~/.aliasrc ]] && source ~/.aliasrc
 
