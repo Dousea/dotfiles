@@ -1,0 +1,12 @@
+{{- /* workstation: full setup. server: full shell on a host you SSH into.
+       minimal: distro packages only, e.g. a Proxmox root shell. */ -}}
+{{- $default := "workstation" -}}
+{{- if or (eq .chezmoi.username "root") (stat "/etc/pve") -}}
+{{-   $default = "minimal" -}}
+{{- end -}}
+{{- $profile := $default -}}
+{{- if stdinIsATTY -}}
+{{-   $profile = promptChoiceOnce . "profile" "Machine profile" (list "workstation" "server" "minimal") $default -}}
+{{- end -}}
+[data]
+  profile = {{ $profile | quote }}
