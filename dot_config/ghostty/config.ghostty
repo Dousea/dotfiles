@@ -1,0 +1,9 @@
+font-family = JetBrainsMono Nerd Font
+font-size = 13
+adjust-cell-height = 20%
+theme = Nord
+cursor-style = bar
+
+command = direct:zsh --login
+shell-integration = zsh
+shell-integration-features = ssh-env,ssh-terminfo

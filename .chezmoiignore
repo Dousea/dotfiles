@@ -1,5 +1,6 @@
 README.md
 {{- if eq .profile "minimal" }}
+.config/ghostty
 .config/nvim
 .local/share/zinit
 .tmux/plugins/tpm
