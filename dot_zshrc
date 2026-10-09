@@ -66,7 +66,7 @@ if [[ -r "$HOME/.local/share/zinit/zinit.zsh" ]]; then
   ZINIT[NO_ALIASES]=1
   source "$HOME/.local/share/zinit/zinit.zsh"
   zinit light zsh-users/zsh-completions
-  # mise's eza release ships no completions.
+  # eza's release binaries ship no completions.
   zinit ice as"completion"
   zinit snippet https://raw.githubusercontent.com/eza-community/eza/main/completions/zsh/_eza
   zinit light zsh-users/zsh-autosuggestions
@@ -261,11 +261,9 @@ compdef _directories mkcd
 (( $+commands[fdfind] )) && compdef fdfind=fd
 (( $+commands[batcat] )) && compdef batcat=bat
 
-# Tool hooks (here rather than .zprofile so tmux panes, which are non-login
-# shells, get them too)
+# Tool hooks, in .zshrc so non-login shells (e.g. tmux panes) get them too.
 (( $+commands[phpenv] )) && eval "$(phpenv init -)"
-# zoxide replaces cd (and cdi for its interactive picker); real paths behave as
-# usual, other arguments jump to the best match from history.
+# zoxide replaces cd; cdi opens its interactive picker.
 (( $+commands[zoxide] )) && eval "$(zoxide init zsh --cmd cd)"
 
 if [[ -n "$ZSH_DEBUGRC" ]]; then

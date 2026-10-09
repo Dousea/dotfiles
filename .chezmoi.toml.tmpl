@@ -1,6 +1,6 @@
-{{- /* full: the complete setup, everywhere by default (Proxmox root included).
-       minimal: opt-in; distro zsh plugins instead of zinit, no tmux plugins,
-       no nvim config. */ -}}
+{{- /* full: the complete setup (default).
+       minimal: distro zsh plugins instead of zinit, no tmux plugins, no nvim
+       config. */ -}}
 {{- $choices := list "full" "minimal" -}}
 {{- $profile := "full" -}}
 {{- if has (get . "profile") $choices -}}

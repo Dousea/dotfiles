@@ -1,7 +1,7 @@
 typeset -U path PATH
 path=("$HOME/.local/bin" $path)
 
-# Homebrew (macOS only; Linux uses the distro package manager and mise)
+# Homebrew (macOS)
 if [[ "$OSTYPE" == darwin* ]]; then
   for brew_bin in /opt/homebrew/bin/brew /usr/local/bin/brew; do
     if [[ -x "$brew_bin" ]]; then
@@ -27,7 +27,7 @@ else
 fi
 path=("$PNPM_HOME" $path)
 
-# PHP (phpenv init itself is in .zshrc so non-login shells get it too)
+# PHP
 [[ -d "$HOME/.phpenv/bin" ]] && path=("$HOME/.phpenv/bin" $path)
 
 # LuaRocks
