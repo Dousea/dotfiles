@@ -64,25 +64,13 @@ function zvm_after_lazy_keybindings() {
 }
 
 function _wrapped_tmux() {
-  local -a tmux_cmd
-  tmux_cmd=(command tmux)
-  tmux_cmd+=(-u)
-
-  if [[ -n "$@" ]]; then
-    $tmux_cmd "$@"
-    return $?
+  if (( $# )); then
+    command tmux -u "$@"
+    return
   fi
 
-  # Try to connect to an existing session.
-  $tmux_cmd attach -t my-session
-
-  # If failed, just run tmux.
-  if [[ $? -ne 0 ]]; then
-    tmux_cmd+=(-f "$HOME/.tmux.conf")
-    $tmux_cmd new-session -s my-session
-  fi
-
-  exit
+  # Attach to the default session, creating it if needed.
+  command tmux -u new-session -A -s my-session
 }
 
 # Alias tmux to our wrapper function.

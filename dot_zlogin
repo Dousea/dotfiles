@@ -6,6 +6,7 @@
 #   if [[ "$ZSH_TMUX_AUTOSTARTED" != "true" ]]; then
 #     export ZSH_TMUX_AUTOSTARTED=true
 #     _wrapped_tmux
+#     exit
 #   fi
 # fi
 #
