@@ -79,7 +79,7 @@ remote machines.
 ## Updating a machine
 
 ```sh
-chezmoi update
+chezmoi update    # or czu
 ```
 
 This pulls this repo and applies it. It also pulls the Neovim config (at most
@@ -119,7 +119,7 @@ To switch, change `profile` in `~/.config/chezmoi/chezmoi.toml` and run
 
 | Command | What it does |
 | --- | --- |
-| `chezmoi update` (`cz update`) | pull this repo and apply it |
+| `chezmoi update` (`czu`) | pull this repo and apply it |
 | `chezmoi edit <file>` (`cze`) | edit the source of a managed file |
 | `chezmoi diff` (`czd`) | show what `apply` would change |
 | `chezmoi apply` (`cza`) | apply the source to `$HOME` |

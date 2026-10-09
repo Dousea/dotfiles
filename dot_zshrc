@@ -166,6 +166,7 @@ if (( $+commands[chezmoi] )); then
   alias cz='chezmoi'
   alias czd='chezmoi diff'
   alias cza='chezmoi apply'
+  alias czu='chezmoi update'
   alias cze='chezmoi edit'
   alias czcd='chezmoi cd'
 fi
