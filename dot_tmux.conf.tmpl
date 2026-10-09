@@ -1,3 +1,9 @@
+{{- $wsl := false -}}
+{{- if eq .chezmoi.os "linux" -}}
+{{-   if contains "microsoft" (lower .chezmoi.kernel.osrelease) -}}
+{{-     $wsl = true -}}
+{{-   end -}}
+{{- end -}}
 # List of plugins
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-sensible'
@@ -15,14 +21,28 @@ set-option -g renumber-windows on
 set -g mouse on
 
 # Enable 256 color support!
+{{- if eq .chezmoi.os "darwin" }}
+# macOS ships an ncurses without the tmux-256color terminfo entry.
 set -g default-terminal "screen-256color"
-set -as terminal-overrides ",xterm-256color*:Tc"
+{{- else }}
+set -g default-terminal "tmux-256color"
+{{- end }}
+set -as terminal-features ",xterm-256color:RGB"
 
+unbind C-b
 set -g prefix C-a
+bind C-a send-prefix
 
-set -g @custom_copy_command '/mnt/c/Windows/System32/clip.exe'
+# tmux-yank detects pbcopy, wl-copy and xclip by itself; only WSL needs help.
 set -g @yank_action 'copy-pipe'
+{{- if $wsl }}
+set -g @custom_copy_command '/mnt/c/Windows/System32/clip.exe'
 bind-key -T copy-mode-vi p run "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace(\"`r\", \"\"))| tmux load-buffer -; tmux paste-buffer"
+{{- else if eq .chezmoi.os "darwin" }}
+bind-key -T copy-mode-vi p run "pbpaste | tmux load-buffer -; tmux paste-buffer"
+{{- else }}
+bind-key -T copy-mode-vi p run "{ wl-paste --no-newline 2>/dev/null || xclip -o -selection clipboard; } | tmux load-buffer -; tmux paste-buffer"
+{{- end }}
 
 bind-key r source-file ~/.tmux.conf\; display 'Reloaded tmux config.'
 
