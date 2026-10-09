@@ -16,6 +16,11 @@ set -g @plugin 'MunifTanjim/tmux-mode-indicator'
 set -g @plugin 'tmux-plugins/tmux-yank'
 set -g @plugin 'thewtex/tmux-mem-cpu-load'
 set -g @plugin 'jlipps/tmux-safekill'
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+set -g @plugin 'tmux-plugins/tmux-continuum'
+
+# Save sessions every 15 minutes and restore them when the tmux server starts
+set -g @continuum-restore 'on'
 
 {{ end -}}
 set-option -g default-command "${SHELL}"
@@ -65,6 +70,8 @@ bind-key -T copy-mode-vi p run "{ wl-paste --no-newline 2>/dev/null || xclip -o 
 {{- end }}
 
 bind-key r source-file ~/.tmux.conf\; display 'Reloaded tmux config.'
+# Pick or create a project session (see ~/.local/bin/tm)
+bind-key f display-popup -E -w 80% -h 60% tm
 
 set -g mode-keys vi
 set -g status-keys vi

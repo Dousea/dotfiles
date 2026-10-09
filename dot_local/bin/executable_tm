@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Open a tmux session for a project directory, named after the directory.
+#
+#   tm           pick from existing sessions and zoxide's directories with fzf
+#   tm <query>   jump to the best zoxide match for <query>
+#
+# Attaches from outside tmux and switches the client from inside it.
+set -euo pipefail
+
+if (( $# )); then
+  dir=$(zoxide query -- "$@")
+else
+  pick=$(
+    {
+      tmux list-sessions -F 'session: #{session_name}' 2>/dev/null || true
+      zoxide query --list
+    } | fzf --height=40% --reverse --prompt='session> '
+  ) || exit 0
+  if [[ "$pick" == "session: "* ]]; then
+    name=${pick#session: }
+  else
+    dir=$pick
+  fi
+fi
+
+if [[ -z "${name:-}" ]]; then
+  # tmux doesn't allow . or : in session names
+  name=$(basename "$dir" | tr '.:' '__')
+  if ! tmux has-session -t "=$name" 2>/dev/null; then
+    tmux new-session -d -s "$name" -c "$dir"
+  fi
+fi
+
+if [[ -n "${TMUX:-}" ]]; then
+  tmux switch-client -t "=$name"
+else
+  tmux -u attach-session -t "=$name"
+fi

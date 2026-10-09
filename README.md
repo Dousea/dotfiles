@@ -56,7 +56,7 @@ adding this to the end of `~/.bashrc`:
 ### 4. Log out and back in
 
 The first zsh start takes a few seconds while zinit downloads the plugins.
-Over SSH, tmux starts automatically in a session called `my-session`.
+Over SSH, tmux starts automatically in a session called `main`.
 
 ### 5. Install the tmux plugins (`full` profile)
 
@@ -96,12 +96,19 @@ To switch, change `profile` in `~/.config/chezmoi/chezmoi.toml` and run
 | `chezmoi apply` (`cza`) | apply the source to `$HOME` |
 | `chezmoi cd` (`czcd`) | open a shell in the source repo |
 | `mise upgrade` | update the mise-managed tools |
+| `tm` | open or switch to a project's tmux session |
 
 Machine-specific aliases go in `~/.aliasrc`, which isn't managed here.
 
 ## tmux
 
 - The prefix is `C-a`.
+- Use one session per project. `tm` (or `C-a f` inside tmux) picks one of your
+  sessions or zoxide's directories with fzf, and opens a session named after the
+  directory; `tm <query>` jumps straight to the best zoxide match. Move between
+  sessions with `C-a s` (tree), `C-a (` / `C-a )` and `C-a L` (last).
+- With the `full` profile, sessions are saved every 15 minutes and restored when
+  tmux starts again, e.g. after a reboot.
 - `F12` switches the local tmux's keys off, so they reach a tmux running over
   SSH inside it. Press `F12` again to switch them back on.
 - Copying from a remote tmux uses OSC 52, which needs a terminal that supports

@@ -118,7 +118,7 @@ function _wrapped_tmux() {
   fi
 
   # Attach to the default session, creating it if needed.
-  command tmux -u new-session -A -s my-session
+  command tmux -u new-session -A -s main
 }
 
 # Alias tmux to our wrapper function.
