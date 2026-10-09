@@ -113,12 +113,14 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
-autoload -Uz compinit && compinit
-
 zstyle ':completion::complete:*' use-cache on
 zstyle ':completion::complete:*' cache-path ~/.zsh/cache
 zstyle ':completion:*' completer _complete
 zstyle ':completion:*' matcher-list '' 'm:{a-z}={A-Z}' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=* l:|=*'
+
+autoload -Uz compinit && compinit
+# Replay the compdefs zinit deferred from plugins loaded before compinit.
+zinit cdreplay -q
 _comp_options+=(globdots) # Include hidden files
 # Use the completions for tmux for our function
 compdef _tmux _wrapped_tmux
