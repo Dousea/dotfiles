@@ -1,0 +1,11 @@
+[user]
+	name = Orlando Hutapea
+	email = dev@orlandohutapea.com
+{{- with lookPath "gh" }}
+[credential "https://github.com"]
+	helper = 
+	helper = !{{ . }} auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !{{ . }} auth git-credential
+{{- end }}
