@@ -26,6 +26,9 @@ set -g @continuum-restore 'on'
 set-option -g default-command "${SHELL}"
 set-option -g base-index 1
 set-option -g renumber-windows on
+# When a session ends (e.g. an SSH session from tm), switch to another one
+# instead of detaching
+set-option -g detach-on-destroy off
 
 # Enable mouse!
 set -g mouse on

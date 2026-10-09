@@ -1,31 +1,72 @@
 #!/usr/bin/env bash
-# Open a tmux session for a project directory, named after the directory.
+# Open a tmux session for a project directory or an SSH host.
 #
-#   tm           pick from existing sessions and zoxide's directories with fzf
-#   tm <query>   jump to the best zoxide match for <query>
+#   tm           pick from existing sessions, SSH hosts and zoxide's directories
+#   tm <query>   SSH host <query> if it's a known one, else the best zoxide match
 #
-# Attaches from outside tmux and switches the client from inside it.
+# Directory sessions are named after the directory; SSH sessions after the host
+# and close when the connection ends. Attaches from outside tmux and switches
+# the client from inside it.
 set -euo pipefail
 
+# SSH destinations from ~/.ssh/config and zsh history, most used first.
+ssh_hosts() {
+  {
+    if [[ -r ~/.ssh/config ]]; then
+      awk 'tolower($1) == "host" { for (i = 2; i <= NF; i++) if ($i !~ /[*?!]/) print $i }' ~/.ssh/config
+    fi
+    if [[ -r "${HISTFILE:-$HOME/.zsh_history}" ]]; then
+      sed -E 's/^: [0-9]+:[0-9]+;//' "${HISTFILE:-$HOME/.zsh_history}" |
+        awk '$1 == "ssh" {
+          # Skip options, and the values of options that take one.
+          for (i = 2; i <= NF; i++) {
+            if ($i ~ /^-[BbcDEeFIiJLlmOoPpQRSWw]$/) { i++; continue }
+            if ($i ~ /^-/) continue
+            print $i
+            break
+          }
+        }'
+    fi
+  } | { grep -Ev '(^|@)(github\.com|gitlab\.com)$|^git@' || true; } |
+    sort | uniq -c | sort -rn | awk '{ print $2 }'
+}
+
+# tmux doesn't allow . or : in session names
+session_name() {
+  tr '.:' '__' <<<"$1"
+}
+
+name="" dir="" host=""
 if (( $# )); then
-  dir=$(zoxide query -- "$@")
+  if grep -qxF -- "$1" <<<"$(ssh_hosts)"; then
+    host=$1
+  else
+    dir=$(zoxide query -- "$@")
+  fi
 else
   pick=$(
     {
       tmux list-sessions -F 'session: #{session_name}' 2>/dev/null || true
+      ssh_hosts | sed 's/^/ssh: /'
       zoxide query --list
     } | fzf --height=40% --reverse --prompt='session> '
   ) || exit 0
-  if [[ "$pick" == "session: "* ]]; then
-    name=${pick#session: }
-  else
-    dir=$pick
-  fi
+  case "$pick" in
+    "session: "*) name=${pick#session: } ;;
+    "ssh: "*) host=${pick#ssh: } ;;
+    *) dir=$pick ;;
+  esac
 fi
 
-if [[ -z "${name:-}" ]]; then
-  # tmux doesn't allow . or : in session names
-  name=$(basename "$dir" | tr '.:' '__')
+if [[ -n "$host" ]]; then
+  name=$(session_name "$host")
+  if ! tmux has-session -t "=$name" 2>/dev/null; then
+    # Keep the session open if ssh fails, so the error stays readable.
+    tmux new-session -d -s "$name" \
+      "ssh $(printf '%q' "$host") || { echo 'ssh failed; press Enter to close'; read _; }"
+  fi
+elif [[ -n "$dir" ]]; then
+  name=$(session_name "$(basename "$dir")")
   if ! tmux has-session -t "=$name" 2>/dev/null; then
     tmux new-session -d -s "$name" -c "$dir"
   fi

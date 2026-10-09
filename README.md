@@ -96,17 +96,19 @@ To switch, change `profile` in `~/.config/chezmoi/chezmoi.toml` and run
 | `chezmoi apply` (`cza`) | apply the source to `$HOME` |
 | `chezmoi cd` (`czcd`) | open a shell in the source repo |
 | `mise upgrade` | update the mise-managed tools |
-| `tm` | open or switch to a project's tmux session |
+| `tm` | open or switch to a project's or server's tmux session |
 
 Machine-specific aliases go in `~/.aliasrc`, which isn't managed here.
 
 ## tmux
 
 - The prefix is `C-a`.
-- Use one session per project. `tm` (or `C-a f` inside tmux) picks one of your
-  sessions or zoxide's directories with fzf, and opens a session named after the
-  directory; `tm <query>` jumps straight to the best zoxide match. Move between
-  sessions with `C-a s` (tree), `C-a (` / `C-a )` and `C-a L` (last).
+- Use one session per project or server. `tm` (or `C-a f` inside tmux) picks
+  one of your sessions, an SSH host (from `~/.ssh/config` and your zsh history)
+  or one of zoxide's directories with fzf, and opens a session for it. `tm
+  <host>` connects straight to a known SSH host; any other `tm <query>` jumps to
+  the best zoxide match. An SSH session closes when the connection ends. Move
+  between sessions with `C-a s` (tree), `C-a (` / `C-a )` and `C-a L` (last).
 - With the `full` profile, sessions are saved every 15 minutes and restored when
   tmux starts again, e.g. after a reboot.
 - `F12` switches the local tmux's keys off, so they reach a tmux running over
