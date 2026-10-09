@@ -7,5 +7,5 @@ if [ ! -t 0 ]; then
   exit 0
 fi
 mkdir -p "$(dirname "$key")"
-chezmoi age decrypt --passphrase --output "$key" "{{ .chezmoi.sourceDir }}/key.txt.age"
+{{ .chezmoi.executable | quote }} age decrypt --passphrase --output "$key" "{{ .chezmoi.sourceDir }}/key.txt.age" || exit 1
 chmod 600 "$key"
