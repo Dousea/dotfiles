@@ -1,0 +1,8 @@
+[tools]
+eza = "latest"
+lazydocker = "latest"
+lazygit = "latest"
+neovim = "latest"
+oh-my-posh = "latest"
+uv = "latest"
+zoxide = "latest"

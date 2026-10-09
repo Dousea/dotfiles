@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+profile={{ .profile | quote }}
+
+SUDO=""
+if (( EUID != 0 )); then
+  SUDO="sudo"
+fi
+
+case "$(uname -s)" in
+  Linux)
+    . /etc/os-release
+    case " ${ID} ${ID_LIKE:-} " in
+      *" fedora "* | *" rhel "*)
+        packages=(zsh tmux git curl fzf ripgrep fd-find bat btop ncdu)
+        if [[ "$profile" == minimal ]]; then
+          packages+=(zsh-autosuggestions zsh-syntax-highlighting)
+        else
+          # cmake and a C++ compiler build tmux-mem-cpu-load
+          packages+=(gcc-c++ make cmake)
+        fi
+        $SUDO dnf install -y "${packages[@]}"
+        ;;
+      *" debian "* | *" ubuntu "*)
+        packages=(zsh tmux git curl fzf ripgrep fd-find bat btop ncdu)
+        if [[ "$profile" == minimal ]]; then
+          packages+=(zsh-autosuggestions zsh-syntax-highlighting)
+        else
+          packages+=(build-essential cmake)
+        fi
+        $SUDO apt-get update
+        $SUDO apt-get install -y "${packages[@]}"
+        ;;
+      *)
+        echo "Unsupported Linux distribution: ${ID}" >&2
+        exit 1
+        ;;
+    esac
+
+    # mise installs the fast-moving CLIs (see ~/.config/mise/config.toml)
+    if [[ "$profile" != minimal && ! -x "$HOME/.local/bin/mise" ]]; then
+      curl -fsSL https://mise.run | sh
+    fi
+    ;;
+  Darwin)
+    # Homebrew is the system package manager on macOS.
+    brew_bin=""
+    for candidate in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+      if [[ -x "$candidate" ]]; then
+        brew_bin="$candidate"
+        break
+      fi
+    done
+    if [[ -z "$brew_bin" ]]; then
+      NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      for candidate in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+        [[ -x "$candidate" ]] && brew_bin="$candidate" && break
+      done
+    fi
+    eval "$("$brew_bin" shellenv)"
+
+    brew bundle --file=/dev/stdin <<BREWFILE
+brew "tmux"
+brew "git"
+brew "fzf"
+brew "ripgrep"
+brew "fd"
+brew "bat"
+brew "btop"
+brew "ncdu"
+brew "cmake"
+brew "mise"
+BREWFILE
+    ;;
+  *)
+    echo "Unsupported OS: $(uname -s)" >&2
+    exit 1
+    ;;
+esac

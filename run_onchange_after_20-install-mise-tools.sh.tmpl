@@ -1,0 +1,22 @@
+{{ if ne .profile "minimal" -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Rerun whenever the tool list changes.
+# mise config hash: {{ include "dot_config/mise/config.toml" | sha256sum }}
+
+mise_bin=""
+for candidate in "$HOME/.local/bin/mise" /opt/homebrew/bin/mise /usr/local/bin/mise "$(command -v mise || true)"; do
+  if [[ -n "$candidate" && -x "$candidate" ]]; then
+    mise_bin="$candidate"
+    break
+  fi
+done
+
+if [[ -z "$mise_bin" ]]; then
+  echo "mise not found; skipping tool install" >&2
+  exit 1
+fi
+
+MISE_YES=1 "$mise_bin" install
+{{ end -}}

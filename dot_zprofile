@@ -1,14 +1,20 @@
 typeset -U path PATH
 path=("$HOME/.local/bin" $path)
 
-# Homebrew
-for brew_bin in /opt/homebrew/bin/brew /usr/local/bin/brew /home/linuxbrew/.linuxbrew/bin/brew; do
-  if [[ -x "$brew_bin" ]]; then
-    eval "$("$brew_bin" shellenv)"
-    break
-  fi
-done
-unset brew_bin
+# Homebrew (macOS only; Linux uses the distro package manager and mise)
+if [[ "$OSTYPE" == darwin* ]]; then
+  for brew_bin in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+    if [[ -x "$brew_bin" ]]; then
+      eval "$("$brew_bin" shellenv)"
+      break
+    fi
+  done
+  unset brew_bin
+fi
+
+# mise shims for non-interactive programs; interactive shells run
+# `mise activate` in .zshrc instead
+[[ -d "$HOME/.local/share/mise/shims" ]] && path=("$HOME/.local/share/mise/shims" $path)
 
 # Rust
 [[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
