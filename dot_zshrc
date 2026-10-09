@@ -116,7 +116,11 @@ _comp_options+=(globdots) # Include hidden files
 # Use the completions for tmux for our function
 compdef _tmux _wrapped_tmux
 
-eval "$(zoxide init zsh)"
+# Tool hooks (here rather than .zprofile so tmux panes, which are non-login
+# shells, get them too)
+(( $+commands[mise] )) && eval "$(mise activate zsh)"
+(( $+commands[phpenv] )) && eval "$(phpenv init -)"
+(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
 
 if [[ -n "$ZSH_DEBUGRC" ]]; then
   zprof

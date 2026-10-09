@@ -6,9 +6,6 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 # Rust
 [[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
 
-# Mise
-[ -x "$(command -v mise)" ] && eval "$(mise activate zsh)"
-
 # pnpm
 export PNPM_HOME="/home/orlando/.local/share/pnpm"
 case ":$PATH:" in
@@ -18,7 +15,6 @@ esac
 
 # PHP
 export PATH="$HOME/.phpenv/bin:$PATH"
-[ -x "$(command -v phpenv)" ] && eval "$(phpenv init -)"
 
 # LuaRocks
 [ -x "$(command -v luarocks)" ] && eval "$(luarocks path --bin)"
