@@ -39,7 +39,7 @@ case "$(uname -s)" in
     esac
 
     # mise installs the fast-moving CLIs (see ~/.config/mise/config.toml)
-    if [[ "$profile" != minimal && ! -x "$HOME/.local/bin/mise" ]]; then
+    if [[ ! -x "$HOME/.local/bin/mise" ]]; then
       curl -fsSL https://mise.run | sh
     fi
     ;;

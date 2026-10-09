@@ -1,5 +1,5 @@
 {{- /* workstation: full setup. server: full shell on a host you SSH into.
-       minimal: distro packages only, e.g. a Proxmox root shell. */ -}}
+       minimal: no zinit or tmux plugins, e.g. a Proxmox root shell. */ -}}
 {{- $default := "workstation" -}}
 {{- if or (eq .chezmoi.username "root") (stat "/etc/pve") -}}
 {{-   $default = "minimal" -}}
