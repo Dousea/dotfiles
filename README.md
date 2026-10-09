@@ -76,6 +76,32 @@ The prompt and the tmux status bar use [Nerd Font](https://www.nerdfonts.com)
 icons. Set one in the terminal you connect *from*; nothing needs installing on
 remote machines.
 
+## Updating a machine
+
+```sh
+chezmoi update
+```
+
+This pulls this repo and applies it. It also pulls the Neovim config (at most
+hourly) and zinit and tpm (weekly), and reinstalls the mise tools if their list
+changed. Then pick up the changes:
+
+- zsh: `reload` in each open shell, or open a new one.
+- tmux: `C-a r` reloads the config.
+
+If `chezmoi update` stops with an error about the config file or encryption,
+the config template changed. Run `chezmoi init`, then `chezmoi apply`.
+
+The tools themselves update separately:
+
+| What | How |
+| --- | --- |
+| mise tools (Neovim, eza, zoxide, …) | `mise upgrade` |
+| zsh plugins | `zinit update --all` |
+| tmux plugins | `C-a U` inside tmux |
+| Neovim plugins | `:Lazy sync` in Neovim |
+| system packages | `sudo dnf upgrade`, `sudo apt upgrade` or `brew upgrade` |
+
 ## Profiles
 
 | | `full` (default) | `minimal` |
@@ -98,7 +124,7 @@ To switch, change `profile` in `~/.config/chezmoi/chezmoi.toml` and run
 | `chezmoi diff` (`czd`) | show what `apply` would change |
 | `chezmoi apply` (`cza`) | apply the source to `$HOME` |
 | `chezmoi cd` (`czcd`) | open a shell in the source repo |
-| `mise upgrade` | update the mise-managed tools |
+| `mise upgrade` | update the mise-managed tools (see [Updating](#updating-a-machine)) |
 | `tm` | open or switch to a project's or server's tmux session |
 
 Machine-specific aliases go in `~/.aliasrc`, which isn't managed here.
