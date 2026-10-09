@@ -7,6 +7,7 @@ zinit light zsh-users/zsh-autosuggestions
 zinit light jeffreytse/zsh-vi-mode
 zinit light akash329d/zsh-alias-finder
 zinit light zsh-users/zsh-syntax-highlighting
+zinit snippet OMZ::plugins/git/git.plugin.zsh
 zinit load 'zsh-users/zsh-history-substring-search'
 zinit ice wait atload'_history_substring_search_config'
 
