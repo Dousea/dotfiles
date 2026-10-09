@@ -117,6 +117,7 @@ Machine-specific aliases go in `~/.aliasrc`, which isn't managed here.
   tmux starts again, e.g. after a reboot.
 - `F12` switches the local tmux's keys off, so they reach a tmux running over
   SSH inside it. Press `F12` again to switch them back on.
-- Copying from a remote tmux uses OSC 52, which needs a terminal that supports
-  it (e.g. kitty, foot, WezTerm, Ghostty). VTE terminals (GNOME Terminal,
-  Ptyxis) don't; hold Shift while selecting to use the terminal's own selection.
+- Copying in tmux also reaches the local clipboard from a remote machine,
+  through OSC 52. That needs a terminal that supports it (e.g. Ghostty, kitty,
+  foot, WezTerm). VTE terminals (GNOME Terminal, Ptyxis) don't; hold Shift
+  while selecting to use the terminal's own selection.
