@@ -61,6 +61,9 @@ function _load_fzf_bindings() {
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
 if [[ -r "$HOME/.local/share/zinit/zinit.zsh" ]]; then
+  # Skip zinit's zi/zini/zpl/zplg aliases; zi belongs to zoxide.
+  typeset -gA ZINIT
+  ZINIT[NO_ALIASES]=1
   source "$HOME/.local/share/zinit/zinit.zsh"
   zinit light zsh-users/zsh-completions
   zinit light zsh-users/zsh-autosuggestions
