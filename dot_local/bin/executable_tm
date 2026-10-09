@@ -2,6 +2,7 @@
 # Open a tmux session for a project directory or an SSH host.
 #
 #   tm           pick from existing sessions, SSH hosts and zoxide's directories
+#                (Ctrl-F in the picker searches every directory under $HOME)
 #   tm <query>   SSH host <query> if it's a known one, else the best zoxide match
 #
 # Directory sessions are named after the directory; SSH sessions after the host
@@ -62,6 +63,24 @@ ssh_hosts() {
   )
 }
 
+# Every directory under $HOME, skipping hidden and gitignored ones.
+all_dirs() {
+  if command -v fd >/dev/null; then
+    fd --type d . "$HOME"
+  elif command -v fdfind >/dev/null; then
+    fdfind --type d . "$HOME"
+  else
+    find "$HOME" -mindepth 1 -name '.*' -prune -o -type d -print 2>/dev/null
+  fi | sed 's:/$::'
+}
+
+# The picker's default list: sessions, SSH hosts and zoxide's directories.
+main_list() {
+  tmux list-sessions -F 'session: #{session_name}' 2>/dev/null || true
+  ssh_hosts | sed 's/^/ssh: /'
+  zoxide query --list
+}
+
 # tmux doesn't allow . or : in session names
 session_name() {
   tr '.:' '__' <<<"$1"
@@ -75,16 +94,31 @@ if (( $# )); then
     dir=$(zoxide query -- "$@")
   fi
 else
-  pick=$(
-    {
-      tmux list-sessions -F 'session: #{session_name}' 2>/dev/null || true
-      ssh_hosts | sed 's/^/ssh: /'
-      zoxide query --list
-    } | fzf --height=40% --reverse --prompt='session> '
-  ) || exit 0
-  case "$pick" in
-    "session: "*) name=${pick#session: } ;;
-    "ssh: "*) host=${pick#ssh: } ;;
+  # Ctrl-F switches between the default list and every directory under $HOME,
+  # keeping what's been typed so far.
+  mode=main query=""
+  while :; do
+    if [[ "$mode" == main ]]; then
+      list=main_list prompt='session> ' header='ctrl-f: search all directories'
+    else
+      list=all_dirs prompt='dir> ' header='ctrl-f: back to sessions'
+    fi
+    status=0
+    out=$("$list" | fzf --height=40% --reverse --prompt="$prompt" --header="$header" \
+      --print-query --query="$query" --expect=ctrl-f) || status=$?
+    query=$(sed -n 1p <<<"$out")
+    key=$(sed -n 2p <<<"$out")
+    pick=$(sed -n 3p <<<"$out")
+    if [[ "$key" == ctrl-f ]]; then
+      [[ "$mode" == main ]] && mode=dirs || mode=main
+      continue
+    fi
+    (( status == 0 )) && [[ -n "$pick" ]] || exit 0
+    break
+  done
+  case "$mode:$pick" in
+    "main:session: "*) name=${pick#session: } ;;
+    "main:ssh: "*) host=${pick#ssh: } ;;
     *) dir=$pick ;;
   esac
 fi
@@ -100,6 +134,8 @@ if [[ -n "$host" ]]; then
     tmux set -t "=$name:" status off \; set -t "=$name:" prefix C-b \; set -t "=$name:" @ssh on
   fi
 elif [[ -n "$dir" ]]; then
+  # Remember it, so it shows up in the default list next time.
+  zoxide add -- "$dir" 2>/dev/null || true
   name=$(session_name "$(basename "$dir")")
   if ! tmux has-session -t "=$name" 2>/dev/null; then
     tmux new-session -d -s "$name" -c "$dir"

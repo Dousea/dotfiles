@@ -145,7 +145,9 @@ with a passphrase; each machine decrypts it once into
 - The prefix is `C-a`.
 - Use one session per project or server. `tm` (or `C-a f` inside tmux) picks
   one of your sessions, an SSH host (from `~/.ssh/config` and your zsh history)
-  or one of zoxide's directories with fzf, and opens a session for it. `tm
+  or one of zoxide's directories (folders you've `cd`'d into) with fzf, and
+  opens a session for it. In the picker, `Ctrl-F` switches to every folder
+  under `~` (skipping hidden and gitignored ones) and back. `tm
   <host>` connects straight to a known SSH host; any other `tm <query>` jumps to
   the best zoxide match. An SSH session closes when the connection ends. Move
   between sessions with `C-a s` (tree), `C-a (` / `C-a )` and `C-a b` (back).
