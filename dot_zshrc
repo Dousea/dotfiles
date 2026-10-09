@@ -66,6 +66,9 @@ if [[ -r "$HOME/.local/share/zinit/zinit.zsh" ]]; then
   ZINIT[NO_ALIASES]=1
   source "$HOME/.local/share/zinit/zinit.zsh"
   zinit light zsh-users/zsh-completions
+  # mise's eza release ships no completions.
+  zinit ice as"completion"
+  zinit snippet https://raw.githubusercontent.com/eza-community/eza/main/completions/zsh/_eza
   zinit light zsh-users/zsh-autosuggestions
   zinit light jeffreytse/zsh-vi-mode
   zinit light akash329d/zsh-alias-finder
@@ -194,6 +197,54 @@ if [[ "$OSTYPE" != darwin* ]]; then
   alias vdir='vdir --color=auto'
 fi
 
+# Completions for tools that can generate their own. Each is cached and only
+# regenerated when the tool's binary changes (path or mtime), e.g. after
+# `mise upgrade`.
+ZSH_COMPLETIONS_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/completions"
+ZSH_COMPLETIONS_STAMPS="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/completion-stamps"
+mkdir -p "$ZSH_COMPLETIONS_DIR" "$ZSH_COMPLETIONS_STAMPS"
+zmodload -F zsh/stat b:zstat
+
+# Usage: _cache_completion <name> <binary> <generator command...>
+function _cache_completion() {
+  local name=$1 bin=${commands[$2]}
+  [[ -n "$bin" ]] || return
+  local -a mtime
+  zstat -A mtime +mtime -- "${bin:A}" 2>/dev/null || return
+  local stamp="$ZSH_COMPLETIONS_STAMPS/$name" key="${bin:A}:$mtime"
+  [[ -r "$stamp" && "$(<$stamp)" == "$key" ]] && return
+
+  local file="$ZSH_COMPLETIONS_DIR/_$name"
+  if "${@:3}" >| "$file.tmp" 2>/dev/null && [[ -s "$file.tmp" ]]; then
+    mv -f "$file.tmp" "$file"
+  else
+    # Older releases may lack the flag; remember that so we don't retry.
+    rm -f "$file.tmp"
+  fi
+  print -r -- "$key" >| "$stamp"
+}
+
+# lazygit's script only defines the function, so the first Tab after loading
+# it would do nothing; call it from the file as well.
+function _lazygit_completion() {
+  lazygit completion zsh && print -r -- '_lazygit "$@"'
+}
+
+_cache_completion chezmoi chezmoi chezmoi completion zsh
+_cache_completion mise mise mise completion zsh
+_cache_completion uv uv uv generate-shell-completion zsh
+_cache_completion uvx uvx uvx --generate-shell-completion zsh
+_cache_completion lazygit lazygit _lazygit_completion
+if (( $+commands[bat] )); then
+  _cache_completion bat bat bat --completion zsh
+else
+  _cache_completion bat batcat batcat --completion zsh
+fi
+unfunction _cache_completion _lazygit_completion
+
+# Also pick up completions that mise-installed tools ship (e.g. zoxide).
+fpath=("$ZSH_COMPLETIONS_DIR" $HOME/.local/share/mise/installs/*/latest/completions(N-/) $fpath)
+
 zstyle ':completion::complete:*' use-cache on
 zstyle ':completion::complete:*' cache-path ~/.zsh/cache
 zstyle ':completion:*' completer _complete
@@ -205,6 +256,10 @@ autoload -Uz compinit && compinit
 _comp_options+=(globdots) # Include hidden files
 # Use the completions for tmux for our function
 compdef _tmux _wrapped_tmux
+compdef _directories mkcd
+# Debian's names for fd and bat
+(( $+commands[fdfind] )) && compdef fdfind=fd
+(( $+commands[batcat] )) && compdef batcat=bat
 
 # Tool hooks (here rather than .zprofile so tmux panes, which are non-login
 # shells, get them too)
