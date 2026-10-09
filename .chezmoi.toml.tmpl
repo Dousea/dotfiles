@@ -1,12 +1,12 @@
-{{- /* workstation: full setup. server: full shell on a host you SSH into.
-       minimal: no zinit or tmux plugins, e.g. a Proxmox root shell. */ -}}
-{{- $default := "workstation" -}}
-{{- if or (eq .chezmoi.username "root") (stat "/etc/pve") -}}
-{{-   $default = "minimal" -}}
-{{- end -}}
-{{- $profile := $default -}}
-{{- if stdinIsATTY -}}
-{{-   $profile = promptChoiceOnce . "profile" "Machine profile" (list "workstation" "server" "minimal") $default -}}
+{{- /* full: the complete setup, everywhere by default (Proxmox root included).
+       minimal: opt-in; distro zsh plugins instead of zinit, no tmux plugins,
+       no nvim config. */ -}}
+{{- $choices := list "full" "minimal" -}}
+{{- $profile := "full" -}}
+{{- if has (get . "profile") $choices -}}
+{{-   $profile = get . "profile" -}}
+{{- else if stdinIsATTY -}}
+{{-   $profile = promptChoice "Machine profile" $choices "full" -}}
 {{- end -}}
 [data]
   profile = {{ $profile | quote }}

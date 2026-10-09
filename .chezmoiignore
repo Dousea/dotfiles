@@ -1,6 +1,5 @@
 {{- if eq .profile "minimal" }}
 .config/nvim
-.local/share/oh-my-posh
 .local/share/zinit
 .tmux/plugins/tpm
 {{- end }}
