@@ -1,12 +1,9 @@
-# NOTE: Disable auto starting of tmux for now.
-# 
-# Autostart if not already in tmux and enabled.
-# if [[ -z "$TMUX" ]]; then
-#   # Actually don't autostart if we already did and multiple autostarts are disabled.
-#   if [[ "$ZSH_TMUX_AUTOSTARTED" != "true" ]]; then
-#     export ZSH_TMUX_AUTOSTARTED=true
-#     _wrapped_tmux
-#     exit
-#   fi
-# fi
-#
+# Autostart tmux on interactive SSH logins, unless we're already inside tmux.
+if [[ -n "$SSH_CONNECTION" && -z "$TMUX" && -o interactive && "$TERM" != dumb ]] && (( $+commands[tmux] )); then
+  # Don't autostart again from a shell that tmux itself started.
+  if [[ "$ZSH_TMUX_AUTOSTARTED" != "true" ]]; then
+    export ZSH_TMUX_AUTOSTARTED=true
+    # Only exit if tmux ran; if it failed, stay in a plain shell.
+    _wrapped_tmux && exit
+  fi
+fi
