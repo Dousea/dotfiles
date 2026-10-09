@@ -31,14 +31,23 @@ set -g default-terminal "tmux-256color"
 {{- end }}
 set -as terminal-features ",xterm-256color:RGB"
 
-{{ if eq .profile "workstation" -}}
 unbind C-b
 set -g prefix C-a
 bind C-a send-prefix
-{{- else -}}
-# Servers keep the default C-b prefix, so a remote tmux inside the local one
-# (prefix C-a) can be driven separately.
-{{- end }}
+
+# F12 switches this tmux's keys off so everything, including the prefix, goes to
+# a nested tmux (e.g. one over SSH). F12 again switches them back on.
+bind -T root F12 \
+  set prefix None \;\
+  set key-table off \;\
+  set status-style "fg=colour245,bg=colour236" \;\
+  if -F '#{pane_in_mode}' 'send-keys -X cancel' \;\
+  refresh-client -S
+bind -T off F12 \
+  set -u prefix \;\
+  set -u key-table \;\
+  set -u status-style \;\
+  refresh-client -S
 
 # tmux-yank detects pbcopy, wl-copy and xclip by itself; only WSL needs help.
 set -g @yank_action 'copy-pipe'
@@ -62,11 +71,11 @@ set -g status-fg white
 set -g status-bg black
 set -g status-interval 1
 {{- if eq .profile "minimal" }}
-set -g status-left "#[fg=black,bg=red] #S #[fg=red,bg=black]"
+set -g status-left "#{?#{==:#{client_key_table},off},#[fg=black#,bg=yellow] OFF ,}#[fg=black,bg=red] #S #[fg=red,bg=black]"
 {{- else }}
-set -g status-left "#{tmux_mode_indicator}#[fg=black,bg=red] #S #[fg=red,bg=black]"
+set -g status-left "#{?#{==:#{client_key_table},off},#[fg=black#,bg=yellow] OFF ,}#{tmux_mode_indicator}#[fg=black,bg=red] #S #[fg=red,bg=black]"
 {{- end }}
-set -g status-left-length 20
+set -g status-left-length 30
 {{- if eq .profile "minimal" }}
 set -g status-right "#[fg=blue,bg=black]#[fg=black,bg=blue] #H "
 {{- else }}
