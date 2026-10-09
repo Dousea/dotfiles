@@ -8,5 +8,12 @@
 {{- else if stdinIsATTY -}}
 {{-   $profile = promptChoice "Machine profile" $choices "full" -}}
 {{- end -}}
+# Private files are encrypted with an age key that is itself stored in the repo
+# as key.txt.age, protected by a passphrase (see run_before_00-decrypt-age-key.sh).
+encryption = "age"
+[age]
+  identity = "~/.config/chezmoi/key.txt"
+  recipient = "age199fd6vetcp7ht0a7z3cx00ecg9ylr9z7476zq2qmv9x4022arv2q9cxlas"
+
 [data]
   profile = {{ $profile | quote }}

@@ -1,0 +1,11 @@
+#!/bin/sh
+# Decrypt the age key used for private files, asking for its passphrase once.
+key="$HOME/.config/chezmoi/key.txt"
+[ -f "$key" ] && exit 0
+if [ ! -t 0 ]; then
+  echo "No terminal to ask for the age key passphrase; skipping private files" >&2
+  exit 0
+fi
+mkdir -p "$(dirname "$key")"
+chezmoi age decrypt --passphrase --output "$key" "{{ .chezmoi.sourceDir }}/key.txt.age"
+chmod 600 "$key"

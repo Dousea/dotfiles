@@ -27,13 +27,16 @@ This installs chezmoi to `~/.local/bin`, clones this repo to
 `~/.local/share/chezmoi` and applies it. Along the way it:
 
 1. Asks for the machine profile (see [Profiles](#profiles)). Press Enter for `full`.
-2. Installs packages with `dnf`, `apt-get` or Homebrew (asks for your `sudo`
+2. Asks for the passphrase of the age key that decrypts the private files
+   (currently `~/.ssh/config`). Without a terminal it skips them; run
+   `chezmoi apply` from a terminal later to add them.
+3. Installs packages with `dnf`, `apt-get` or Homebrew (asks for your `sudo`
    password): zsh, tmux, git, fzf, ripgrep, fd, bat, btop, ncdu and build tools.
    On macOS it installs Homebrew first if it's missing.
-3. Installs [mise](https://mise.jdx.dev) and the tools in
+4. Installs [mise](https://mise.jdx.dev) and the tools in
    `~/.config/mise/config.toml`: Neovim, eza, zoxide, oh-my-posh, lazygit,
    lazydocker, uv and Node LTS.
-4. Clones the Neovim config, zinit and tpm.
+5. Clones the Neovim config, zinit and tpm.
 
 If a step fails, fix the cause and run `~/.local/bin/chezmoi apply` again.
 
@@ -99,6 +102,17 @@ To switch, change `profile` in `~/.config/chezmoi/chezmoi.toml` and run
 | `tm` | open or switch to a project's or server's tmux session |
 
 Machine-specific aliases go in `~/.aliasrc`, which isn't managed here.
+
+### Private files
+
+Files with secrets or private details (server addresses, for example) are
+stored encrypted with [age](https://age-encryption.org), so they can live in
+this public repo. The key itself is in the repo as `key.txt.age`, encrypted
+with a passphrase; each machine decrypts it once into
+`~/.config/chezmoi/key.txt`.
+
+- Add or update a private file: `chezmoi add --encrypt <file>`
+- Edit one in place: `chezmoi edit <file>` (decrypts and re-encrypts for you)
 
 ## tmux
 

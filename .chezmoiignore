@@ -1,4 +1,10 @@
 README.md
+key.txt.age
+{{- /* Without the age key there's nothing to decrypt with, and without a
+       terminal there's no way to ask for its passphrase. */}}
+{{- if and (not (stat (joinPath .chezmoi.homeDir ".config/chezmoi/key.txt"))) (not stdinIsATTY) }}
+.ssh/config
+{{- end }}
 {{- if eq .profile "minimal" }}
 .config/ghostty
 .config/nvim
