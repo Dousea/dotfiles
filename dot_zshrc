@@ -128,7 +128,7 @@ alias tmux=_wrapped_tmux
 if (( $+commands[eza] )); then
   alias eza='eza --icons=auto'
   alias ls='eza'
-  alias ll='eza -alF'
+  alias ll='eza -al --classify=auto'
   alias la='eza -a'
   alias lt='eza --tree --level=2'
 else
