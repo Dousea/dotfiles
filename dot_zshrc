@@ -61,7 +61,7 @@ function _load_fzf_bindings() {
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
 if [[ -r "$HOME/.local/share/zinit/zinit.zsh" ]]; then
-  # Skip zinit's zi/zini/zpl/zplg aliases; zi belongs to zoxide.
+  # Skip zinit's zi/zini/zpl/zplg shorthand aliases.
   typeset -gA ZINIT
   ZINIT[NO_ALIASES]=1
   source "$HOME/.local/share/zinit/zinit.zsh"
@@ -264,7 +264,9 @@ compdef _directories mkcd
 # Tool hooks (here rather than .zprofile so tmux panes, which are non-login
 # shells, get them too)
 (( $+commands[phpenv] )) && eval "$(phpenv init -)"
-(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
+# zoxide replaces cd (and cdi for its interactive picker); real paths behave as
+# usual, other arguments jump to the best match from history.
+(( $+commands[zoxide] )) && eval "$(zoxide init zsh --cmd cd)"
 
 if [[ -n "$ZSH_DEBUGRC" ]]; then
   zprof
