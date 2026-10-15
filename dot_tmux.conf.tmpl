@@ -21,9 +21,11 @@ set -g @plugin 'tmux-plugins/tmux-continuum'
 
 # Save sessions every 15 minutes and restore them when the tmux server starts
 set -g @continuum-restore 'on'
+# tm waits on these marker files for the restore to finish (see ~/.local/bin/tm).
+set -g @resurrect-hook-pre-restore-all 'touch "${XDG_RUNTIME_DIR:-/tmp}/tm-restore-$(id -u).started"'
 # The restore ends by switching the client to the session saved as active; send
-# it back to the one tm just opened (see ~/.local/bin/tm), then forget it.
-set -g @resurrect-hook-post-restore-all 't=$(tmux show -gqv @tm_target); [ -n "$t" ] && tmux has-session -t "=$t" 2>/dev/null && tmux switch-client -t "=$t"; tmux set -gu @tm_target'
+# it back to the one tm just opened, then forget it.
+set -g @resurrect-hook-post-restore-all 't=$(tmux show -gqv @tm_target); [ -n "$t" ] && tmux has-session -t "=$t" 2>/dev/null && tmux switch-client -t "=$t"; tmux set -gu @tm_target; touch "${XDG_RUNTIME_DIR:-/tmp}/tm-restore-$(id -u).done"'
 
 {{ end -}}
 set-option -g default-command "${SHELL}"

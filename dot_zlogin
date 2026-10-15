@@ -3,7 +3,8 @@ if [[ -n "$SSH_CONNECTION" && -z "$TMUX" && -o interactive && "$TERM" != dumb ]]
   # Don't autostart again from a shell that tmux itself started.
   if [[ "$ZSH_TMUX_AUTOSTARTED" != "true" ]]; then
     export ZSH_TMUX_AUTOSTARTED=true
+    # Always the main session, not tm's picker: tm's SSH sessions expect it.
     # Only exit if tmux ran; if it failed, stay in a plain shell.
-    _wrapped_tmux && exit
+    command tmux -u new-session -A -s main && exit
   fi
 fi

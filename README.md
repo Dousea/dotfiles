@@ -143,6 +143,10 @@ with a passphrase; each machine decrypts it once into
 ## tmux
 
 - The prefix is `C-a`.
+- A new local terminal opens `tm`'s picker (below); `Esc` leaves a plain shell,
+  and `NO_TM=1` skips it. Bare `tmux` opens the picker too. SSH logins go
+  straight to the `main` session instead. On the first start after a reboot,
+  the picker waits a moment for the saved sessions to be restored.
 - Use one session per project or server. `tm` (or `C-a f` inside tmux) picks
   one of your sessions, an SSH host (from `~/.ssh/config` and your zsh history)
   or one of zoxide's directories (folders you've `cd`'d into) with fzf, and

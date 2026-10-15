@@ -117,8 +117,13 @@ function _wrapped_tmux() {
     return
   fi
 
-  # Attach to the default session, creating it if needed.
-  command tmux -u new-session -A -s main
+  # Pick a session with tm; without tm or fzf, attach to the default session,
+  # creating it if needed.
+  if (( $+commands[tm] && $+commands[fzf] )); then
+    tm
+  else
+    command tmux -u new-session -A -s main
+  fi
 }
 
 # Alias tmux to our wrapper function.
@@ -261,6 +266,14 @@ compdef _directories mkcd
 (( $+commands[phpenv] )) && eval "$(phpenv init -)"
 # zoxide replaces cd; cdi opens its interactive picker.
 (( $+commands[zoxide] )) && eval "$(zoxide init zsh --cmd cd)"
+
+# Open tm's picker in new local terminals (SSH logins get tmux from .zlogin).
+# Esc in the picker leaves a plain shell; NO_TM=1 skips it.
+if [[ -o interactive && -z "$TMUX" && -z "$NO_TM" && -z "$SSH_CONNECTION" && -t 0 && -t 1 ]] &&
+  [[ "$TERM_PROGRAM" != vscode && "$TERMINAL_EMULATOR" != JetBrains-JediTerm ]] &&
+  (( $+commands[tm] && $+commands[fzf] )); then
+  tm
+fi
 
 if [[ -n "$ZSH_DEBUGRC" ]]; then
   zprof
