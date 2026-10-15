@@ -142,6 +142,9 @@ elif [[ -n "$dir" ]]; then
   fi
 fi
 
+# On a fresh server, continuum's restore runs a moment after this and would
+# leave the client on the saved session; its hook switches back to this one.
+tmux set -g @tm_target "$name"
 if [[ -n "${TMUX:-}" ]]; then
   tmux switch-client -t "=$name"
 else
