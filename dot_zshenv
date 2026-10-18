@@ -2,3 +2,5 @@
 # scripts. Interactive options live in .zshrc.
 export EDITOR=nvim
 export VISUAL=nvim
+export COCOINDEX_DISABLE_USAGE_TRACKING=1
+export MCP_TIMEOUT=60000
