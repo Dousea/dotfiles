@@ -51,6 +51,10 @@ set -g allow-passthrough on
 # tmux on a remote machine or nested inside this one
 set -s set-clipboard on
 set -g focus-events on
+# Pass Shift+Enter, Ctrl+Enter and Alt+Enter through as distinct keys (Pi needs them).
+# -q: tmux before 3.5 has no extended-keys-format and would stop on it.
+set -gq extended-keys on
+set -gq extended-keys-format csi-u
 
 # Move between Neovim splits and tmux panes with Ctrl+h/j/k/l
 # (smart-splits.nvim sets @pane-is-vim on panes running Neovim)
