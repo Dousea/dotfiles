@@ -54,6 +54,8 @@ case "$(uname -s)" in
       fi
     done
     if [[ -z "$brew_bin" ]]; then
+      # NONINTERACTIVE makes the installer use sudo -n, so cache the password first
+      sudo -v
       NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       for candidate in /opt/homebrew/bin/brew /usr/local/bin/brew; do
         [[ -x "$candidate" ]] && brew_bin="$candidate" && break
