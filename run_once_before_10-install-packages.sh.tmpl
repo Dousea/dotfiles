@@ -73,6 +73,14 @@ brew "ncdu"
 brew "cmake"
 brew "mise"
 BREWFILE
+
+    # The terminal and the font its config uses; minimal skips ~/.config/ghostty
+    if [[ "$profile" != minimal ]]; then
+      brew bundle --file=/dev/stdin <<BREWFILE
+cask "ghostty"
+cask "font-jetbrains-mono-nerd-font"
+BREWFILE
+    fi
     ;;
   *)
     echo "Unsupported OS: $(uname -s)" >&2

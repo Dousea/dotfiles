@@ -7,3 +7,13 @@ cursor-style = bar
 command = direct:zsh --login
 shell-integration = zsh
 shell-integration-features = ssh-env,ssh-terminfo
+
+macos-option-as-alt = true
+keybind = ctrl+shift+c=copy_to_clipboard
+keybind = ctrl+shift+v=paste_from_clipboard
+keybind = ctrl+shift+t=new_tab
+keybind = ctrl+shift+w=close_surface
+keybind = ctrl+tab=next_tab
+keybind = ctrl+shift+tab=previous_tab
+keybind = alt+shift+plus=new_split:right
+keybind = alt+shift+minus=new_split:down
