@@ -17,3 +17,4 @@ keybind = ctrl+tab=next_tab
 keybind = ctrl+shift+tab=previous_tab
 keybind = alt+shift+plus=new_split:right
 keybind = alt+shift+minus=new_split:down
+keybind = global:ctrl+grave_accent=toggle_quick_terminal
