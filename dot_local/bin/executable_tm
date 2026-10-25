@@ -20,19 +20,30 @@ ssh_target() {
   ssh -G -- "$1" 2>/dev/null | awk '$1 == "user" { u = $2 } $1 == "hostname" { h = $2 } END { print u "@" h }'
 }
 
+# Whether a hostname resolves, giving up after half a second. macOS has neither
+# getent nor timeout.
+resolves() {
+  if command -v getent >/dev/null && command -v timeout >/dev/null; then
+    timeout 0.5 getent hosts "$1" >/dev/null
+  else
+    perl -MTime::HiRes=ualarm -e 'ualarm 500000; exit !gethostbyname($ARGV[0])' "$1" 2>/dev/null
+  fi
+}
+
 # SSH destinations: ~/.ssh/config hosts first, then zsh history, most used
 # first. History entries that a config host already covers, or whose hostname
 # no longer resolves, are left out.
 ssh_hosts() {
-  local -A seen=()
+  # Newline-delimited, since macOS's bash 3.2 has no associative arrays.
+  local seen=$'\n'
   local host target hostname
 
   if [[ -r ~/.ssh/config ]]; then
     while read -r host; do
       is_git_host "$host" && continue
       target=$(ssh_target "$host")
-      [[ -n "${seen[$target]:-}" ]] && continue
-      seen[$target]=1
+      [[ "$seen" == *$'\n'"$target"$'\n'* ]] && continue
+      seen+="$target"$'\n'
       printf '%s\n' "$host"
     done < <(awk 'tolower($1) == "host" { for (i = 2; i <= NF; i++) if ($i !~ /[*?!]/) print $i }' ~/.ssh/config)
   fi
@@ -41,10 +52,10 @@ ssh_hosts() {
   while read -r host; do
     is_git_host "$host" && continue
     target=$(ssh_target "$host")
-    [[ -n "${seen[$target]:-}" ]] && continue
-    seen[$target]=1
+    [[ "$seen" == *$'\n'"$target"$'\n'* ]] && continue
+    seen+="$target"$'\n'
     hostname=${target#*@}
-    if [[ ! "$hostname" =~ ^[0-9.]+$|: ]] && ! timeout 0.5 getent hosts "$hostname" >/dev/null; then
+    if [[ ! "$hostname" =~ ^[0-9.]+$|: ]] && ! resolves "$hostname"; then
       continue
     fi
     printf '%s\n' "$host"
