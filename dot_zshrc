@@ -70,6 +70,13 @@ if [[ -r "$HOME/.local/share/zinit/zinit.zsh" ]]; then
   zinit ice as"completion"
   zinit snippet https://raw.githubusercontent.com/eza-community/eza/main/completions/zsh/_eza
   zinit light zsh-users/zsh-autosuggestions
+  # Cursor per vi mode. Terminals have block, underline and bar; underline is the nearest to a half block.
+  function zvm_config() {
+    ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BEAM
+    ZVM_NORMAL_MODE_CURSOR=$ZVM_CURSOR_UNDERLINE
+    ZVM_VISUAL_MODE_CURSOR=$ZVM_CURSOR_BLOCK
+    ZVM_VISUAL_LINE_MODE_CURSOR=$ZVM_CURSOR_BLOCK
+  }
   zinit light jeffreytse/zsh-vi-mode
   zinit light akash329d/zsh-alias-finder
   zinit light zsh-users/zsh-syntax-highlighting
