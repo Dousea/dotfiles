@@ -39,12 +39,7 @@ set-option -g detach-on-destroy off
 set -g mouse on
 
 # Enable 256 color support!
-{{- if eq .chezmoi.os "darwin" }}
-# macOS ships an ncurses without the tmux-256color terminfo entry.
-set -g default-terminal "screen-256color"
-{{- else }}
 set -g default-terminal "tmux-256color"
-{{- end }}
 set -as terminal-features ",xterm-256color:RGB"
 set -g allow-passthrough on
 # Send copies to the outer terminal's clipboard (OSC 52), including from a
