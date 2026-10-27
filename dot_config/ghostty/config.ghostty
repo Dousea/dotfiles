@@ -6,7 +6,7 @@ cursor-style = bar
 
 command = direct:zsh --login
 shell-integration = zsh
-shell-integration-features = ssh-env,ssh-terminfo
+shell-integration-features = no-cursor,ssh-env,ssh-terminfo
 
 macos-option-as-alt = true
 keybind = ctrl+shift+c=copy_to_clipboard
