@@ -11,3 +11,6 @@ key.txt.age
 .local/share/zinit
 .tmux/plugins/tpm
 {{- end }}
+{{- if ne .chezmoi.os "darwin" }}
+.pi
+{{- end }}

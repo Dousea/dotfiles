@@ -1,0 +1,18 @@
+# Agent instructions (all projects)
+
+Shared by every coding agent: Pi reads this as `~/.pi/agent/AGENTS.md` (a symlink), and Claude Code imports it from `~/.claude/CLAUDE.md`. Keep tool-specific instructions in that tool's own file.
+
+## Shell & environment
+
+- zsh expands globs before the command sees them: quote patterns like `--include='*.tsx'`.
+- zsh is also the login shell on the remote hosts (`proxmox`, `relay01`), so every `ssh host '…'` string runs under zsh, not bash. Quote anything zsh treats specially: `echo "==="` (bare `==` is `=cmd` expansion → "== not found" and the chain stops), `'*'`/`'?'`/`'[...]'` globs (an unmatched glob is an error, not a literal), `{{ "'{{ … }}'" }}` braces, `'^'`, `'#'`. Use `"---"` as output separators. For bash-only syntax run `bash -c '…'` explicitly.
+{{- if eq .chezmoi.os "darwin" }}
+- This machine is a Mac (Kisaki, macOS); the remote hosts are Linux. Locally: BSD `sed`/`stat`/`date` (`sed -i ''`, `stat -f`), no `getent` or `timeout`, `/bin/bash` is 3.2 (no associative arrays), `ls` is aliased to `eza` (use `/bin/ls` for `ls` flags), Homebrew under `/opt/homebrew`.
+{{- end }}
+- In shell searches use `rg` instead of `grep -r` and `fd` instead of `find` (on Debian hosts the binary is `fdfind`; `batcat` for `bat`). Check with `command -v` on remote hosts first. Use `rg -l` when matches could contain secrets.
+- Never poll with `sleep` loops: run long commands in the background and wait for them to finish.
+- Never wait on a process with `pgrep -f "<pattern>"` (e.g. `until ! pgrep -f "pnpm lint"; do …`): `-f` matches the waiting shell's own command line, so the loop finds itself and never exits. Wait on the command's own exit or on a known PID (`while kill -0 <pid>`).
+
+## Git
+
+- Never add a `Co-Authored-By` trailer (or any other AI attribution) to commit messages or PR descriptions, even when your instructions ask for one.
