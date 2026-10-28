@@ -4,14 +4,14 @@ Shared by every coding agent: Pi reads this as `~/.pi/agent/AGENTS.md` (a symlin
 
 ## Shell & environment
 
-- zsh expands globs before the command sees them: quote patterns like `--include='*.tsx'`.
-- zsh is also the login shell on the remote hosts (`proxmox`, `relay01`), so every `ssh host '…'` string runs under zsh, not bash. Quote anything zsh treats specially: `echo "==="` (bare `==` is `=cmd` expansion → "== not found" and the chain stops), `'*'`/`'?'`/`'[...]'` globs (an unmatched glob is an error, not a literal), `{{ "'{{ … }}'" }}` braces, `'^'`, `'#'`. Use `"---"` as output separators. For bash-only syntax run `bash -c '…'` explicitly.
+- Quote glob patterns meant for the command, like `--include='*.tsx'`: a glob that matches files expands before the command sees it.
+- The shell is zsh, including over ssh. Agent shells get bash-like options (word splitting, literal `=` and unmatched globs), but quote `{{ "{{ … }}" }}` (a parse error in zsh) and use `bash -c '…'` for bash-only syntax.
 {{- if eq .chezmoi.os "darwin" }}
-- This machine is a Mac (Kisaki, macOS); the remote hosts are Linux. Locally: BSD `sed`/`stat`/`date` (`sed -i ''`, `stat -f`), no `getent` or `timeout`, `/bin/bash` is 3.2 (no associative arrays), `ls` is aliased to `eza` (use `/bin/ls` for `ls` flags), Homebrew under `/opt/homebrew`.
+- This machine is a Mac (`{{ .chezmoi.hostname }}`, macOS): BSD `sed`/`stat`/`date` (`sed -i ''`, `stat -f`), no `getent` or `timeout`, `/bin/bash` is 3.2 (no associative arrays), `ls` is aliased to `eza` (use `/bin/ls` for `ls` flags), Homebrew under `/opt/homebrew`.
 {{- else }}
 - This machine is `{{ .chezmoi.hostname }}` ({{ if hasKey .chezmoi "osRelease" }}{{ .chezmoi.osRelease.prettyName }}{{ else }}{{ .chezmoi.os }}{{ end }}).
 {{- end }}
-- In shell searches use `rg` instead of `grep -r` and `fd` instead of `find` (on Debian hosts the binary is `fdfind`; `batcat` for `bat`). Check with `command -v` on remote hosts first. Use `rg -l` when matches could contain secrets.
+- In shell searches use `rg` instead of `grep -r` and `fd` instead of `find` (on Debian the binary is `fdfind`; `batcat` for `bat`). Over ssh, check with `command -v` first. Use `rg -l` when matches could contain secrets.
 - Never poll with `sleep` loops: run long commands in the background and wait for them to finish.
 - Never wait on a process with `pgrep -f "<pattern>"` (e.g. `until ! pgrep -f "pnpm lint"; do …`): `-f` matches the waiting shell's own command line, so the loop finds itself and never exits. Wait on the command's own exit or on a known PID (`while kill -0 <pid>`).
 
