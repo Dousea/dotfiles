@@ -109,6 +109,7 @@ The tools themselves update separately:
 | zsh plugins | zinit | the distro's `zsh-autosuggestions` and `zsh-syntax-highlighting` |
 | tmux plugins | tpm, with CPU/memory in the status bar | none, hostname in the status bar |
 | Neovim config | yes | no |
+| Agent instructions (Claude Code, Pi) | yes | no |
 | C/C++ build tools | yes | no |
 | mise tools | yes | yes |
 

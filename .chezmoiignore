@@ -6,12 +6,11 @@ key.txt.age
 .ssh/config
 {{- end }}
 {{- if eq .profile "minimal" }}
+.claude
+.config/agents
 .config/ghostty
 .config/nvim
 .local/share/zinit
-.tmux/plugins/tpm
-{{- end }}
-{{- if ne .chezmoi.os "darwin" }}
 .pi
-.claude
+.tmux/plugins/tpm
 {{- end }}
