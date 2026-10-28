@@ -2,7 +2,11 @@
 # scripts. Interactive options live in .zshrc. The one exception: coding
 # agents' shells (Claude Code, Codex, Pi) get sh-like word splitting and
 # literal = and unmatched globs, so the commands they write behave as in bash.
-[[ ! -o interactive && ( -n $CLAUDECODE || -n $CODEX_THREAD_ID || -n $PI_CODING_AGENT ) ]] && setopt sh_word_split no_nomatch no_equals
+# LC_AGENT_SHELL carries this over ssh (SendEnv; sshd accepts LC_*).
+if [[ -n $CLAUDECODE || -n $CODEX_THREAD_ID || -n $PI_CODING_AGENT ]]; then
+  export LC_AGENT_SHELL=1
+fi
+[[ ! -o interactive && -n $LC_AGENT_SHELL ]] && setopt sh_word_split no_nomatch no_equals
 
 export EDITOR=nvim
 export VISUAL=nvim
