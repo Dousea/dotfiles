@@ -1,0 +1,20 @@
+#!/bin/sh
+# miyuki-ps [script.ps1]: run a PowerShell script on Miyuki (Windows PowerShell 5.1), from the file or stdin
+# (`miyuki-ps <<'PS' … PS`). The whole script is read as UTF-8 and run as one script block, so non-ASCII text,
+# multi-line statements and quotes arrive as written; output comes back as UTF-8. Errors stop the script and exit 1
+# ($ErrorActionPreference = Stop; set it back to Continue at the top of a script that should go on), and `exit N`
+# exits N. `powershell -Command -` instead reads stdin line by line in the console code page: a multi-line statement
+# not followed by a blank line is dropped without an error, and so is everything after it.
+host=${MIYUKI_HOST:-miyuki}
+reader='$ErrorActionPreference = [Management.Automation.ActionPreference]::Stop; $OutputEncoding = [Console]::OutputEncoding = New-Object Text.UTF8Encoding $false; & ([ScriptBlock]::Create((New-Object IO.StreamReader ([Console]::OpenStandardInput()), (New-Object Text.UTF8Encoding $false)).ReadToEnd()))'
+if [ $# -gt 1 ]; then
+  echo "usage: miyuki-ps [script.ps1]   (no file: the script from stdin)" >&2
+  exit 2
+fi
+if [ $# -eq 1 ]; then
+  exec < "$1" || exit 2
+fi
+ssh -o ConnectTimeout=10 "$host" "$reader"
+rc=$?
+[ $rc -eq 255 ] && echo "miyuki-ps: ssh failed; if it timed out Miyuki is likely asleep: ssh proxmox wake-miyuki -w 60" >&2
+exit $rc
