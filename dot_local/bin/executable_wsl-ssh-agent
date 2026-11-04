@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# wsl-ssh-agent: relay the Windows SSH agent (Bitwarden desktop's, on the named pipe
+# //./pipe/openssh-ssh-agent) into WSL as a Unix socket, and print the line that exports it:
+#   eval "$(wsl-ssh-agent)"
+# Starts the relay (socat + npiperelay.exe) only if it isn't already listening, so it is cheap
+# to run from every login shell. Prints nothing outside WSL or when a piece is missing.
+set -euo pipefail
+
+[[ -n "${WSL_DISTRO_NAME:-}" ]] || exit 0
+
+# /run/user/<uid> is a private tmpfs under systemd, so a stale socket never survives a reboot.
+runtime="/run/user/$(id -u)"
+if [[ -d "$runtime" && -w "$runtime" ]]; then
+  sock="$runtime/ssh-agent.sock"
+else
+  sock="$HOME/.ssh/agent.sock"
+fi
+
+# wsl.conf may keep the Windows PATH out of WSL, so also look where winget puts it.
+relay="${NPIPERELAY:-}"
+if [[ -z "$relay" ]]; then
+  relay="$(command -v npiperelay.exe || true)"
+fi
+if [[ -z "$relay" ]]; then
+  for candidate in /mnt/c/Users/*/AppData/Local/Microsoft/WinGet/Links/npiperelay.exe \
+    /mnt/c/Users/*/AppData/Local/Microsoft/WinGet/Packages/albertony.npiperelay_*/npiperelay.exe; do
+    if [[ -x "$candidate" ]]; then
+      relay="$candidate"
+      break
+    fi
+  done
+fi
+
+if [[ -z "$relay" ]]; then
+  echo "wsl-ssh-agent: npiperelay.exe not found (winget install albertony.npiperelay)" >&2
+  exit 0
+fi
+if ! command -v socat >/dev/null; then
+  echo "wsl-ssh-agent: socat not found (sudo apt install socat)" >&2
+  exit 0
+fi
+
+if ! ss -xlH | awk -v s="$sock" '$5 == s { found = 1 } END { exit !found }'; then
+  rm -f "$sock"
+  # setsid detaches the relay from this terminal so it outlives the shell that started it.
+  setsid socat "UNIX-LISTEN:$sock,fork,mode=600" \
+    "EXEC:$relay -ei -s //./pipe/openssh-ssh-agent,nofork" </dev/null >/dev/null 2>&1 &
+  # Give socat a moment to create the socket before the first ssh uses it.
+  for _ in 1 2 3 4 5 6 7 8 9 10; do
+    [[ -S "$sock" ]] && break
+    sleep 0.05
+  done
+fi
+
+printf 'export SSH_AUTH_SOCK=%q\n' "$sock"

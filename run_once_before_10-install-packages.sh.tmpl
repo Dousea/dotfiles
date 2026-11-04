@@ -20,6 +20,10 @@ case "$(uname -s)" in
           # cmake and a C++ compiler build tmux-mem-cpu-load
           packages+=(gcc-c++ make cmake)
         fi
+        # socat relays the Windows SSH agent into WSL (see wsl-ssh-agent)
+        if [[ -n "${WSL_DISTRO_NAME:-}" ]]; then
+          packages+=(socat)
+        fi
         $SUDO dnf install -y "${packages[@]}"
         ;;
       *" debian "* | *" ubuntu "*)
@@ -28,6 +32,10 @@ case "$(uname -s)" in
           packages+=(zsh-autosuggestions zsh-syntax-highlighting)
         else
           packages+=(build-essential cmake)
+        fi
+        # socat relays the Windows SSH agent into WSL (see wsl-ssh-agent)
+        if [[ -n "${WSL_DISTRO_NAME:-}" ]]; then
+          packages+=(socat)
         fi
         # A broken third-party repo shouldn't block installing from the rest
         $SUDO apt-get update || echo "warning: apt-get update failed, using cached package lists" >&2
@@ -42,6 +50,19 @@ case "$(uname -s)" in
     # mise installs the fast-moving CLIs (see ~/.config/mise/config.toml)
     if [[ ! -x "$HOME/.local/bin/mise" ]]; then
       curl -fsSL https://mise.run | sh
+    fi
+
+    # npiperelay.exe is the Windows half of the SSH agent relay (see wsl-ssh-agent).
+    # wsl.conf may keep the Windows PATH out of WSL, so find winget by its path.
+    if [[ -n "${WSL_DISTRO_NAME:-}" ]]; then
+      for winget in /mnt/c/Users/*/AppData/Local/Microsoft/WindowsApps/winget.exe; do
+        if [[ -x "$winget" ]]; then
+          "$winget" install --exact --id albertony.npiperelay \
+            --accept-source-agreements --accept-package-agreements ||
+            echo "warning: installing npiperelay failed" >&2
+          break
+        fi
+      done
     fi
     ;;
   Darwin)

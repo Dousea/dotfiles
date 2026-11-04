@@ -32,3 +32,6 @@ path=("$PNPM_HOME" $path)
 
 # LuaRocks
 (( $+commands[luarocks] )) && eval "$(luarocks path --bin)"
+
+# SSH agent from Bitwarden desktop on Windows, relayed into WSL (see wsl-ssh-agent)
+[[ -n "$WSL_DISTRO_NAME" && -x "$HOME/.local/bin/wsl-ssh-agent" ]] && eval "$("$HOME/.local/bin/wsl-ssh-agent")"
